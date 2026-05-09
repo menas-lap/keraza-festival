@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مهرجان الكرازة — تسجيل الدخول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+
+      <!-- Header -->
+      <div class="auth-header">
+        <span class="cross">☩</span>
+        <h1>مهرجان الكرازة</h1>
+        <p>تسجيل الدخول</p>
+        <div class="divider"></div>
+      </div>
+
+      <!-- Form -->
+      <div class="field">
+        <label>الاسم أو الرقم القومي <span class="req">*</span></label>
+        <input type="text" id="identifier" placeholder="اكتب اسمك أو رقمك القومي">
+        <div class="ferr" id="e-identifier">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>كلمة المرور <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="••••••••">
+        <div class="ferr" id="e-password">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field" id="errorMsg" style="display:none">
+        <div style="background:#FFF0F0;border:1px solid #FFCDD2;border-radius:8px;padding:10px 14px;color:#B83232;font-size:0.88rem;text-align:center;">
+          اسم المستخدم أو كلمة المرور غير صحيحة
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">
+        تسجيل الدخول
+      </button>
+
+      <div style="text-align:center; margin-top:20px;">
+        <a href="register.html" style="color:var(--primary);font-size:0.88rem;text-decoration:none;font-weight:600;">
+          مش عندك حساب؟ سجل دلوقتي ←
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // If already logged in → redirect
+    const session = getSession();
+    if (session) redirectByRole(session.role);
+
+    // Enter key support
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") handleLogin();
+    });
+
+    async function handleLogin() {
+      const identifier = document.getElementById("identifier").value.trim();
+      const password   = document.getElementById("password").value.trim();
+      const btn        = document.getElementById("loginBtn");
+      const errorMsg   = document.getElementById("errorMsg");
+
+      // Basic validation
+      let valid = true;
+      if (!identifier) {
+        document.getElementById("e-identifier").classList.add("on");
+        valid = false;
+      } else {
+        document.getElementById("e-identifier").classList.remove("on");
+      }
+      if (!password) {
+        document.getElementById("e-password").classList.add("on");
+        valid = false;
+      } else {
+        document.getElementById("e-password").classList.remove("on");
+      }
+      if (!valid) return;
+
+      // Loading state
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      errorMsg.style.display = "none";
+
+      try {
+        const res = await apiLogin(identifier, password);
+
+        if (res.success) {
+          // Save session based on role
+          if (res.role === "admin") {
+            saveSession({ role: "admin", name: res.name, id: res.id });
+
+          } else if (res.role === "servant") {
+            saveSession({
+              role:    "servant",
+              name:    res.name,
+              id:      res.id,
+              service: res.service,
+              stages:  res.stages
+            });
+
+          } else if (res.role === "student") {
+            saveSession({ role: "student", student: res.student });
+          }
+
+          redirectByRole(res.role);
+
+        } else {
+          errorMsg.style.display = "block";
+          btn.disabled  = false;
+          btn.innerHTML = "تسجيل الدخول";
+        }
+
+      } catch (err) {
+        errorMsg.style.display = "block";
+        btn.disabled  = false;
+        btn.innerHTML = "تسجيل الدخول";
+      }
+    }
+  </script>
+
+</body>
+</html>
