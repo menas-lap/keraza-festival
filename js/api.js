@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_URL/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzio4QM4vOVY_I1Jffu95ZrRFKxJXAxrg2z3Q9BfT8YXz32LfbV10EerChztAYO5DzCfw/exec";
 
 // ══════════════════════════════════════════
 //  BASE REQUESTS
