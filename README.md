@@ -1,1 +1,0 @@
-# keraza-festival
