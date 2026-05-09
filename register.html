@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مهرجان الكرازة — تسجيل جديد</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { padding: 20px 16px 40px; }
+    .register-wrap { max-width: 580px; margin: 0 auto; }
+
+    .reg-header {
+      text-align: center;
+      padding: 32px 20px 20px;
+    }
+    .reg-header .cross {
+      font-size: 48px;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .reg-header h1 { font-size: 1.7rem; }
+    .reg-header p  { color: var(--text-secondary); margin-top: 6px; font-size: 0.9rem; }
+
+    .form-card {
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 4px 24px var(--shadow);
+      padding: 28px 22px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Amiri', serif;
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--cream-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::before {
+      content: '';
+      width: 4px; height: 20px;
+      background: var(--gold);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .ornament {
+      text-align: center;
+      color: var(--gold);
+      font-size: 1rem;
+      margin-top: 20px;
+      letter-spacing: 10px;
+    }
+
+    /* national id owner radio */
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .radio-chip { cursor: pointer; display: inline-flex; align-items: center; }
+    .radio-chip input[type="radio"] { display: none; }
+    .radio-chip span {
+      display: inline-block;
+      padding: 8px 18px;
+      border: 1.5px solid var(--border-light);
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--white);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .radio-chip input:checked + span {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* kindergarten notice */
+    #kindergartenNotice {
+      display: none;
+      background: #FFF8E1;
+      border: 1px solid #FFE082;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #7B6000;
+      margin-bottom: 16px;
+    }
+    #kindergartenNotice.on { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="register-wrap">
+
+    <!-- Header -->
+    <div class="reg-header">
+      <span class="cross">☩</span>
+      <h1>استبيان مهرجان الكرازة</h1>
+      <p>يُرجى ملء جميع البيانات بدقة</p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- ── Personal Info ── -->
+    <div class="form-card">
+      <div class="section-title">البيانات الشخصية</div>
+
+      <div class="field">
+        <label>الاسم الرباعي <span class="req">*</span></label>
+        <input type="text" id="fullName" placeholder="الاسم الأول والثاني والثالث والرابع">
+        <div class="ferr" id="e-fullName">يرجى كتابة الاسم الرباعي كاملاً (٤ أسماء على الأقل)</div>
+      </div>
+
+      <div class="field">
+        <label>المرحلة <span class="req">*</span></label>
+        <select id="stage">
+          <option value="">— اختر المرحلة —</option>
+        </select>
+        <div class="ferr" id="e-stage">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>الخدمة <span class="req">*</span></label>
+        <select id="service">
+          <option value="">— اختر الخدمة —</option>
+        </select>
+        <div class="ferr" id="e-service">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>النوع <span class="req">*</span></label>
+        <select id="gender">
+          <option value="">— اختر —</option>
+        </select>
+        <div class="ferr" id="e-gender">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>تاريخ الميلاد <span class="req">*</span></label>
+        <input type="date" id="birthDate">
+        <div class="ferr" id="e-birthDate">يرجى إدخال تاريخ ميلاد صحيح</div>
+      </div>
+
+      <div class="field">
+        <label>الأسرة</label>
+        <input type="text" id="family" placeholder="اسم الأسرة">
+      </div>
+    </div>
+
+    <!-- ── National ID ── -->
+    <div class="form-card">
+      <div class="section-title">الرقم القومي</div>
+
+      <!-- Kindergarten notice -->
+      <div id="kindergartenNotice" class="on">
+        ⚠️ في حالة الحضانة، يُستخدم الرقم القومي لولي الأمر
+      </div>
+
+      <div class="field" id="ownerField" style="display:none">
+        <label>الرقم القومي بتاع <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-chip">
+            <input type="radio" name="idOwner" value="father">
+            <span>الأب</span>
+          </label>
+          <label class="radio-chip">
+            <input type="radio" name="idOwner" value="mother">
+            <span>الأم</span>
+          </label>
+        </div>
+        <div class="ferr" id="e-idOwner">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>الرقم القومي <span class="req">*</span></label>
+        <input type="text" id="nationalId" placeholder="14 رقم" maxlength="14" dir="ltr" style="text-align:right">
+        <div class="ferr" id="e-nationalId">يرجى إدخال رقم قومي صحيح (14 رقم)</div>
+      </div>
+    </div>
+
+    <!-- ── Contact ── -->
+    <div class="form-card">
+      <div class="section-title">بيانات التواصل</div>
+
+      <div class="field">
+        <label>رقم تليفون ولي الأمر <span class="req">*</span></label>
+        <input type="tel" id="parentPhone" placeholder="01xxxxxxxxx" maxlength="11" dir="ltr" style="text-align:right">
+        <div class="ferr" id="e-parentPhone">رقم التليفون يجب أن يكون ١١ رقم ويبدأ بـ 01</div>
+      </div>
+
+      <div class="field">
+        <label>رقم تليفون المخدوم</label>
+        <input type="tel" id="studentPhone" placeholder="01xxxxxxxxx" maxlength="11" dir="ltr" style="text-align:right">
+        <div class="ferr" id="e-studentPhone">رقم التليفون يجب أن يكون ١١ رقم ويبدأ بـ 01</div>
+      </div>
+    </div>
+
+    <!-- ── Photos ── -->
+    <div class="form-card">
+      <div class="section-title">الصور</div>
+
+      <div class="field">
+        <label>صورة شهادة الميلاد <span class="req">*</span></label>
+        <div class="file-zone" id="zone-birth">
+          <input type="file" accept="image/*" onchange="handleFile(this,'birth')">
+          <div class="file-icon">🪪</div>
+          <div class="file-label">اضغط لرفع صورة شهادة الميلاد</div>
+        </div>
+        <div class="preview" id="prev-birth">
+          <img id="img-birth" src="" alt="">
+          <button type="button" class="replace-btn" onclick="replaceImage('birth')">تغيير الصورة</button>
+        </div>
+        <div class="ferr" id="e-birth">هذا الحقل مطلوب</div>
+      </div>
+
+      <div class="field">
+        <label>الصورة الشخصية <span class="req">*</span></label>
+        <div class="file-zone" id="zone-photo">
+          <input type="file" accept="image/*" onchange="handleFile(this,'photo')">
+          <div class="file-icon">📷</div>
+          <div class="file-label">اضغط لرفع الصورة الشخصية</div>
+        </div>
+        <div class="preview" id="prev-photo">
+          <img id="img-photo" src="" alt="">
+          <button type="button" class="replace-btn" onclick="replaceImage('photo')">تغيير الصورة</button>
+        </div>
+        <div class="ferr" id="e-photo">هذا الحقل مطلوب</div>
+      </div>
+    </div>
+
+    <!-- ── Competitions ── -->
+    <div class="form-card">
+      <div class="section-title">المسابقات</div>
+
+      <div class="field">
+        <label>الروحي <span class="req">*</span></label>
+        <div class="checkbox-group" id="holy"></div>
+        <div class="ferr" id="e-holy">يرجى اختيار مسابقة روحية واحدة على الأقل</div>
+      </div>
+
+      <div class="field">
+        <label>الرياضي <span class="req">*</span></label>
+        <div class="checkbox-group" id="sport"></div>
+        <div class="ferr" id="e-sport">يرجى اختيار مسابقة رياضية واحدة على الأقل</div>
+      </div>
+    </div>
+
+    <!-- ── Password ── -->
+    <div class="form-card">
+      <div class="section-title">كلمة المرور</div>
+
+      <div class="field">
+        <label>كلمة المرور <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="اختار كلمة مرور تتذكرها">
+        <div class="ferr" id="e-password">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
+      </div>
+
+      <div class="field">
+        <label>تأكيد كلمة المرور <span class="req">*</span></label>
+        <input type="password" id="confirmPassword" placeholder="أعد كتابة كلمة المرور">
+        <div class="ferr" id="e-confirmPassword">كلمتا المرور غير متطابقتين</div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="btn btn-primary" id="submitBtn" onclick="handleRegister()">
+      إنشاء الحساب ☩
+    </button>
+
+    <div style="text-align:center; margin-top:16px;">
+      <a href="index.html" style="color:var(--primary);font-size:0.88rem;text-decoration:none;font-weight:600;">
+        عندك حساب؟ سجل دخول ←
+      </a>
+    </div>
+
+    <div class="ornament">✦ ✦ ✦</div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
