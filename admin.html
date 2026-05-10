@@ -118,7 +118,61 @@
           </table>
         </div>
       </div>
-
+      <!-- ── Settings Tab ── -->
+      <div id="tab-settings" class="screen">
+        <div class="page-title">⚙️ الإعدادات</div>
+      
+        <!-- Services -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">
+            الخدمات
+            <button class="btn btn-gold btn-sm" style="margin-right:auto;"
+              onclick="openAddModal('service')">+ إضافة</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>الاسم</th><th>الكود</th><th>إجراءات</th></tr>
+              </thead>
+              <tbody id="settings-service"></tbody>
+            </table>
+          </div>
+        </div>
+      
+        <!-- Stages -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">
+            المراحل
+            <button class="btn btn-gold btn-sm" style="margin-right:auto;"
+              onclick="openAddModal('stage')">+ إضافة</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>الاسم</th><th>الكود</th><th>إجراءات</th></tr>
+              </thead>
+              <tbody id="settings-stage"></tbody>
+            </table>
+          </div>
+        </div>
+      
+        <!-- Gender -->
+        <div class="card">
+          <div class="card-title">
+            النوع
+            <button class="btn btn-gold btn-sm" style="margin-right:auto;"
+              onclick="openAddModal('gender')">+ إضافة</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>الاسم</th><th>الكود</th><th>إجراءات</th></tr>
+              </thead>
+              <tbody id="settings-gender"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
