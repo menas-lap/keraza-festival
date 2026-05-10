@@ -232,12 +232,12 @@ async function handleDeleteStudent() {
 const addImages = { photo: null, birth: null };
 
 async function openAddStudentModal() {
-  // Reset fields
-  ["fullName","nationalId","family","parentPhone",
-   "studentPhone","password","confirmPassword"].forEach(id => {
+  // Reset all fields
+  ["fullName","nationalId","family","parentPhone","studentPhone",
+   "password","confirmPassword"].forEach(id => {
     document.getElementById("add-" + id).value = "";
   });
-  ["add-stage","add-gender","add-nationalIdOwner"].forEach(id => {
+  ["add-stage","add-service","add-gender","add-nationalIdOwner"].forEach(id => {
     document.getElementById(id).value = "";
   });
   document.querySelectorAll("#add-holy input, #add-sport input")
@@ -246,51 +246,50 @@ async function openAddStudentModal() {
   addImages.birth = null;
   replaceAddImage("photo");
   replaceAddImage("birth");
+
+  // Clear errors
   document.querySelectorAll("[id^='e-add-']").forEach(el => el.classList.remove("on"));
 
-  // Lock service to servant's service
-  document.getElementById("add-service").value          = session.service;
-  document.getElementById("add-service-display").value  = session.service;
-
-  // Fill stage — only servant's stages
-  const stageEl = document.getElementById("add-stage");
-  stageEl.innerHTML = '<option value="">— اختر —</option>';
-  const stageList = session.stages.split("\n").filter(s => s.trim());
-  stageList.forEach(v => {
-    stageEl.innerHTML += `<option value="${v}">${v}</option>`;
-  });
-
-  // Watch stage for kindergarten
-  stageEl.onchange = () => {
-    const isKG = stageEl.value === "حضانة";
-    document.getElementById("add-ownerField").style.display = isKG ? "block" : "none";
-  };
-
-  // Fill gender + competitions from API
+  // Fetch fresh options
+  let opts;
   try {
-    const opts = await apiGetOptions();
-    const genderEl = document.getElementById("add-gender");
-    genderEl.innerHTML = '<option value="">— اختر —</option>';
-    opts.gender.forEach(v => genderEl.innerHTML += `<option value="${v}">${v}</option>`);
-    fillAddChips("add-holy",  opts.holy);
-    fillAddChips("add-sport", opts.sport);
+    opts = await apiGetOptions();
+    if (!opts.success) {
+      showToast("خطأ في تحميل البيانات", "error");
+      return;
+    }
   } catch (err) {
     showToast("خطأ في تحميل البيانات", "error");
     return;
   }
 
-  document.getElementById("addStudentModal").classList.add("open");
-}
+  if (!opts || !opts.stage || !opts.service) {
+    showToast("خطأ في تحميل البيانات، يرجي المحاولة مرة أخري", "error");
+    return;
+  }
+  
+  const addStage   = document.getElementById("add-stage");
+  const addService = document.getElementById("add-service");
+  const addGender  = document.getElementById("add-gender");
+  
+  addStage.innerHTML   = '<option value="">— اختر —</option>';
+  addService.innerHTML = '<option value="">— اختر —</option>';
+  addGender.innerHTML  = '<option value="">— اختر —</option>';
+  
+  opts.stage.forEach(v   => addStage.innerHTML   += `<option value="${v}">${v}</option>`);
+  opts.service.forEach(v => addService.innerHTML += `<option value="${v}">${v}</option>`);
+  opts.gender.forEach(v  => addGender.innerHTML  += `<option value="${v}">${v}</option>`);
+  
+  fillChips("add-holy",  opts.holy);
+  fillChips("add-sport", opts.sport);
+  // Watch stage for kindergarten
+  addStage.onchange = () => {
+    const isKG = addStage.value === "حضانة";
+    document.getElementById("add-serviceField").style.display = isKG ? "none" : "block";
+    document.getElementById("add-ownerField").style.display   = isKG ? "block" : "none";
+  };
 
-function fillAddChips(groupId, values) {
-  const el = document.getElementById(groupId);
-  el.innerHTML = "";
-  values.forEach(v => {
-    const label = document.createElement("label");
-    label.className = "chip";
-    label.innerHTML = `<input type="checkbox" value="${v}"><span>${v}</span>`;
-    el.appendChild(label);
-  });
+  document.getElementById("addStudentModal").classList.add("open");
 }
 
 function closeAddStudentModal() {
@@ -353,12 +352,16 @@ async function handleAddStudent() {
   // Name
   const name  = document.getElementById("add-fullName").value.trim();
   const words = name.split(/\s+/).filter(w => w.length > 0);
-  if (!name)             fail("fullName", "هذا الحقل مطلوب");
+  if (!name)          fail("fullName", "هذا الحقل مطلوب");
   else if (words.length < 4) fail("fullName", "يرجى كتابة الاسم الرباعي (٤ أسماء)");
   else pass("fullName");
 
   // Stage
   if (!stage) fail("stage", "هذا الحقل مطلوب"); else pass("stage");
+
+  // Service (not required for KG)
+  const service = document.getElementById("add-service").value;
+  if (!isKG && !service) fail("service", "هذا الحقل مطلوب"); else pass("service");
 
   // Gender
   if (!document.getElementById("add-gender").value) fail("gender", "هذا الحقل مطلوب");
@@ -385,7 +388,7 @@ async function handleAddStudent() {
 
   // Parent phone
   const parentPhone = document.getElementById("add-parentPhone").value.trim();
-  if (!parentPhone)                     fail("parentPhone", "هذا الحقل مطلوب");
+  if (!parentPhone)                   fail("parentPhone", "هذا الحقل مطلوب");
   else if (!phoneReg.test(parentPhone)) fail("parentPhone", "رقم غير صحيح");
   else pass("parentPhone");
 
@@ -431,7 +434,7 @@ async function handleAddStudent() {
   const payload = {
     fullName:        name,
     stage,
-    service:         session.service,
+    service:         isKG ? "" : service,
     gender:          document.getElementById("add-gender").value,
     birthDate:       document.getElementById("add-birthDate").value,
     family:          document.getElementById("add-family").value.trim(),
