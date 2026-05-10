@@ -40,7 +40,10 @@
 
       <!-- ── Students Tab ── -->
       <div id="tab-students" class="screen active">
-        <div class="page-title">👥 المخدومين</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div class="page-title" style="margin-bottom:0;">👥 المخدومين</div>
+          <button class="btn btn-gold" onclick="openAddStudentModal()">+ إضافة طالب</button>
+        </div>
 
         <!-- Stats -->
         <div class="stats-grid" id="statsGrid"></div>
@@ -142,6 +145,153 @@
         </button>
         <button class="btn btn-secondary btn-sm" onclick="closeModal()">
           إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADD STUDENT MODAL ══ -->
+  <div class="modal-overlay" id="addStudentModal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-title">إضافة طالب جديد</div>
+  
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+  
+        <div class="field">
+          <label>الاسم الرباعي <span class="req">*</span></label>
+          <input type="text" id="add-fullName" placeholder="الاسم الأول والثاني والثالث والرابع">
+          <div class="ferr" id="e-add-fullName">يرجى كتابة الاسم الرباعي (٤ أسماء)</div>
+        </div>
+  
+        <div class="field">
+          <label>المرحلة <span class="req">*</span></label>
+          <select id="add-stage">
+            <option value="">— اختر —</option>
+          </select>
+          <div class="ferr" id="e-add-stage">هذا الحقل مطلوب</div>
+        </div>
+  
+        <div class="field" id="add-serviceField">
+          <label>الخدمة</label>
+          <!-- locked to servant's service — filled automatically -->
+          <input type="text" id="add-service-display" disabled
+            style="background:var(--cream);color:var(--text-secondary);">
+          <input type="hidden" id="add-service">
+        </div>
+  
+        <div class="field">
+          <label>النوع <span class="req">*</span></label>
+          <select id="add-gender">
+            <option value="">— اختر —</option>
+          </select>
+          <div class="ferr" id="e-add-gender">هذا الحقل مطلوب</div>
+        </div>
+  
+        <div class="field">
+          <label>تاريخ الميلاد <span class="req">*</span></label>
+          <input type="date" id="add-birthDate">
+          <div class="ferr" id="e-add-birthDate">هذا الحقل مطلوب</div>
+        </div>
+  
+        <div class="field">
+          <label>الأسرة</label>
+          <input type="text" id="add-family" placeholder="اسم الأسرة">
+        </div>
+  
+        <div class="field">
+          <label>الرقم القومي <span class="req">*</span></label>
+          <input type="text" id="add-nationalId" placeholder="14 رقم"
+            maxlength="14" dir="ltr" style="text-align:right;">
+          <div class="ferr" id="e-add-nationalId">رقم قومي غير صحيح (14 رقم)</div>
+        </div>
+  
+        <div class="field" id="add-ownerField" style="display:none;">
+          <label>الرقم القومي بتاع <span class="req">*</span></label>
+          <select id="add-nationalIdOwner">
+            <option value="">— اختر —</option>
+            <option value="father">الأب</option>
+            <option value="mother">الأم</option>
+          </select>
+          <div class="ferr" id="e-add-nationalIdOwner">هذا الحقل مطلوب</div>
+        </div>
+  
+        <div class="field">
+          <label>تليفون ولي الأمر <span class="req">*</span></label>
+          <input type="tel" id="add-parentPhone" placeholder="01xxxxxxxxx"
+            maxlength="11" dir="ltr" style="text-align:right;">
+          <div class="ferr" id="e-add-parentPhone">رقم غير صحيح</div>
+        </div>
+  
+        <div class="field">
+          <label>تليفون المخدوم</label>
+          <input type="tel" id="add-studentPhone" placeholder="01xxxxxxxxx"
+            maxlength="11" dir="ltr" style="text-align:right;">
+          <div class="ferr" id="e-add-studentPhone">رقم غير صحيح</div>
+        </div>
+  
+        <div class="field">
+          <label>كلمة المرور <span class="req">*</span></label>
+          <input type="password" id="add-password" placeholder="6 أحرف على الأقل">
+          <div class="ferr" id="e-add-password">6 أحرف على الأقل</div>
+        </div>
+  
+        <div class="field">
+          <label>تأكيد كلمة المرور <span class="req">*</span></label>
+          <input type="password" id="add-confirmPassword" placeholder="أعد كتابة كلمة المرور">
+          <div class="ferr" id="e-add-confirmPassword">كلمتا المرور غير متطابقتين</div>
+        </div>
+  
+      </div>
+  
+      <!-- Photos -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div class="field">
+          <label>صورة شهادة الميلاد <span class="req">*</span></label>
+          <div class="file-zone" id="add-zone-birth">
+            <input type="file" accept="image/*" onchange="handleAddFile(this,'birth')">
+            <div class="file-icon">🪪</div>
+            <div class="file-label">اضغط للرفع</div>
+          </div>
+          <div class="preview" id="add-prev-birth">
+            <img id="add-img-birth" src="" alt="">
+            <button type="button" class="replace-btn" onclick="replaceAddImage('birth')">تغيير</button>
+          </div>
+          <div class="ferr" id="e-add-birth">هذا الحقل مطلوب</div>
+        </div>
+  
+        <div class="field">
+          <label>الصورة الشخصية <span class="req">*</span></label>
+          <div class="file-zone" id="add-zone-photo">
+            <input type="file" accept="image/*" onchange="handleAddFile(this,'photo')">
+            <div class="file-icon">📷</div>
+            <div class="file-label">اضغط للرفع</div>
+          </div>
+          <div class="preview" id="add-prev-photo">
+            <img id="add-img-photo" src="" alt="">
+            <button type="button" class="replace-btn" onclick="replaceAddImage('photo')">تغيير</button>
+          </div>
+          <div class="ferr" id="e-add-photo">هذا الحقل مطلوب</div>
+        </div>
+      </div>
+  
+      <!-- Competitions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div class="field">
+          <label>الروحي <span class="req">*</span></label>
+          <div class="checkbox-group" id="add-holy"></div>
+          <div class="ferr" id="e-add-holy">اختر واحدة على الأقل</div>
+        </div>
+        <div class="field">
+          <label>الرياضي <span class="req">*</span></label>
+          <div class="checkbox-group" id="add-sport"></div>
+          <div class="ferr" id="e-add-sport">اختر واحدة على الأقل</div>
+        </div>
+      </div>
+  
+      <div class="modal-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeAddStudentModal()">إلغاء</button>
+        <button class="btn btn-primary btn-sm" id="addStudentBtn" onclick="handleAddStudent()">
+          إضافة الطالب ☩
         </button>
       </div>
     </div>
