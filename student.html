@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مهرجان الكرازة — حسابي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="dashboard">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="cross">☩</span>
+        <h2>مهرجان الكرازة</h2>
+        <p id="studentName">...</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="showTab('profile')">
+          👤 بياناتي
+        </button>
+        <button class="nav-item" onclick="showTab('competitions')">
+          🏆 مسابقاتي
+        </button>
+        <button class="nav-item" onclick="showTab('password')">
+          🔑 تغيير كلمة المرور
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%" onclick="logout()">
+          تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <main class="main-content">
+
+      <!-- ── Profile Tab ── -->
+      <div id="tab-profile" class="screen active">
+        <div class="page-title">👤 بياناتي</div>
+
+        <div class="card">
+          <!-- Student ID badge -->
+          <div style="text-align:center; margin-bottom:24px;">
+            <div id="studentIdBadge" style="
+              display:inline-block;
+              background:var(--cream-dark);
+              border:2px solid var(--gold);
+              border-radius:12px;
+              padding:10px 28px;
+              font-size:1.3rem;
+              font-weight:700;
+              color:var(--primary);
+              letter-spacing:2px;
+              font-family:'Amiri',serif;
+            ">...</div>
+            <div style="color:var(--text-secondary);font-size:0.8rem;margin-top:6px;">رقم تسجيلك</div>
+          </div>
+
+          <!-- Photos -->
+          <div style="display:flex;gap:16px;justify-content:center;margin-bottom:28px;flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <img id="profilePhoto" src="" alt="الصورة الشخصية"
+                style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);display:none;">
+              <div style="color:var(--text-secondary);font-size:0.78rem;margin-top:6px;">الصورة الشخصية</div>
+            </div>
+            <div style="text-align:center;">
+              <img id="birthCertImg" src="" alt="شهادة الميلاد"
+                style="width:100px;height:100px;border-radius:12px;object-fit:cover;border:3px solid var(--border);display:none;">
+              <div style="color:var(--text-secondary);font-size:0.78rem;margin-top:6px;">شهادة الميلاد</div>
+            </div>
+          </div>
+
+          <!-- Info Grid -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+            <div class="info-item">
+              <div class="info-label">الاسم الرباعي</div>
+              <div class="info-value" id="info-fullName">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">المرحلة</div>
+              <div class="info-value" id="info-stage">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">الخدمة</div>
+              <div class="info-value" id="info-service">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">النوع</div>
+              <div class="info-value" id="info-gender">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">تاريخ الميلاد</div>
+              <div class="info-value" id="info-birthDate">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">الأسرة</div>
+              <div class="info-value" id="info-family">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">رقم ولي الأمر</div>
+              <div class="info-value" id="info-parentPhone">—</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">رقم المخدوم</div>
+              <div class="info-value" id="info-studentPhone">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Competitions Tab ── -->
+      <div id="tab-competitions" class="screen">
+        <div class="page-title">🏆 مسابقاتي</div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">الروحي</div>
+          <div id="info-holy" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">الرياضي</div>
+          <div id="info-sport" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+        </div>
+      </div>
+
+      <!-- ── Password Tab ── -->
+      <div id="tab-password" class="screen">
+        <div class="page-title">🔑 تغيير كلمة المرور</div>
+
+        <div class="card" style="max-width:420px;">
+          <div class="field">
+            <label>كلمة المرور الجديدة <span class="req">*</span></label>
+            <input type="password" id="newPassword" placeholder="6 أحرف على الأقل">
+            <div class="ferr" id="e-newPassword">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
+          </div>
+          <div class="field">
+            <label>تأكيد كلمة المرور <span class="req">*</span></label>
+            <input type="password" id="confirmNewPassword" placeholder="أعد كتابة كلمة المرور">
+            <div class="ferr" id="e-confirmNewPassword">كلمتا المرور غير متطابقتين</div>
+          </div>
+          <button class="btn btn-primary" id="changePassBtn" onclick="handleChangePassword()">
+            حفظ كلمة المرور الجديدة
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <style>
+    .info-item {
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .info-value {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+  </style>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/student.js"></script>
+</body>
+</html>
