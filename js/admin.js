@@ -546,7 +546,8 @@ function openAddModal(type) {
 
 // ── Open Edit Modal ──
 function openEditModal(type, row, name, code) {
-  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع", holy: "مسابقة روحية", sport: "مسابقة رياضية" };
+  const typeNames  = { service: "خدمة", stage: "مرحلة", gender: "نوع", holy: "مسابقة روحية", sport: "مسابقة رياضية" };
+  const hascCode   = (type === "service" || type === "stage" || type === "gender");
   settingModalMode = "edit";
   settingModalType = type;
   settingModalRow  = row;
