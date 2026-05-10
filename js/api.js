@@ -90,3 +90,22 @@ async function apiCreateServant(data) {
 async function apiDeleteServant(servantId) {
   return apiPost({ action: "deleteServant", servantId });
 }
+
+// ══════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════
+async function apiGetSettings() {
+  return apiGet({ action: "settings", role: "admin" });
+}
+
+async function apiUpdateSetting(row, name, code) {
+  return apiPost({ action: "updateSetting", row, name, code });
+}
+
+async function apiAddSetting(type, name, code) {
+  return apiPost({ action: "addSetting", type, name, code });
+}
+
+async function apiDeleteSetting(row) {
+  return apiPost({ action: "deleteSetting", row });
+}
