@@ -546,7 +546,7 @@ function openAddModal(type) {
 
 // ── Open Edit Modal ──
 function openEditModal(type, row, name, code) {
-  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع" };
+  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع", holy: "مسابقة روحية", sport: "مسابقة رياضية" };
   settingModalMode = "edit";
   settingModalType = type;
   settingModalRow  = row;
@@ -558,6 +558,11 @@ function openEditModal(type, row, name, code) {
   document.getElementById("e-setting-name").classList.remove("on");
   document.getElementById("e-setting-code").classList.remove("on");
   document.getElementById("settingModalBtn").textContent = "حفظ التعديل";
+
+  // ← السطر ده هو اللي ناقص
+  document.getElementById("setting-code").closest(".field").style.display =
+    hasCode ? "block" : "none";
+  
   document.getElementById("settingModal").classList.add("open");
 }
 
