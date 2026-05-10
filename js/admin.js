@@ -474,6 +474,8 @@ async function loadSettings() {
     renderSettingsTable("service");
     renderSettingsTable("stage");
     renderSettingsTable("gender");
+    renderSettingsTable("holy");
+    renderSettingsTable("sport");
   } catch (err) {
     showToast("خطأ في تحميل الإعدادات", "error");
   }
