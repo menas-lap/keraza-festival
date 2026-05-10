@@ -2,7 +2,6 @@
 //  INIT
 // ══════════════════════════════════════════
 const session = requireRole("admin");
-await loadSettings();
 let allStudents    = [];
 let allServants    = [];
 let currentStudent = null;
@@ -11,6 +10,7 @@ let options        = {};
 if (session) init();
 
 async function init() {
+  await loadSettings();
   document.getElementById("adminName").textContent = session.name;
 
   // Load options for filters + edit dropdowns
