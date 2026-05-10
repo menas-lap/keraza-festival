@@ -483,6 +483,10 @@ function renderSettingsTable(type) {
   const tbody = document.getElementById("settings-" + type);
   const items = currentSettings[type] || [];
 
+  if (!tbody) return;
+
+  const items = currentSettings[type] || [];
+
   if (items.length === 0) {
     tbody.innerHTML = `
       <tr><td colspan="3"
@@ -492,14 +496,17 @@ function renderSettingsTable(type) {
     return;
   }
 
+  const hasCode = (type === "service" || type === "stage" || type === "gender");
+  
   tbody.innerHTML = items.map(item => `
     <tr>
       <td style="font-weight:600;">${item.name}</td>
+      ${hasCode ? `
       <td>
         <span class="badge badge-gold" style="font-family:monospace;letter-spacing:2px;">
           ${item.code}
         </span>
-      </td>
+      </td>` : `<td>-</td>`}
       <td style="display:flex;gap:6px;">
         <button class="btn btn-secondary btn-sm"
           onclick="openEditModal('${type}', ${item.row}, '${item.name}', '${item.code}')">
