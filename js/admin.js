@@ -525,7 +525,9 @@ function renderSettingsTable(type) {
 
 // ── Open Add Modal ──
 function openAddModal(type) {
-  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع" };
+  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع", holy: "مسابقة روحية", sport: "مسابقة رياضية" };
+  const hasCode = (type === "service" || type === "stage" || type === "gender");
+  
   settingModalMode = "add";
   settingModalType = type;
   settingModalRow  = null;
@@ -537,6 +539,11 @@ function openAddModal(type) {
   document.getElementById("e-setting-name").classList.remove("on");
   document.getElementById("e-setting-code").classList.remove("on");
   document.getElementById("settingModalBtn").textContent = "إضافة";
+
+  // Hide code field for holy and sport
+  document.getElementById("setting-code").closest(".field").style.display =
+    hasCode ? "block" : "none";
+  
   document.getElementById("settingModal").classList.add("open");
 }
 
@@ -563,9 +570,12 @@ function closeSettingModal() {
 
 // ── Save (Add or Edit) ──
 async function handleSaveSetting() {
-  const name = document.getElementById("setting-name").value.trim();
-  const code = document.getElementById("setting-code").value.trim();
-  const btn  = document.getElementById("settingModalBtn");
+  const name     = document.getElementById("setting-name").value.trim();
+  const code     = document.getElementById("setting-code").value.trim();
+  const btn      = document.getElementById("settingModalBtn");
+  const hasCode  = (settingModalType === "service"  ||
+                    settingModalType === "stage"    ||
+                    settingModalType === "gender");
 
   // Validate
   let valid = true;
@@ -574,7 +584,7 @@ async function handleSaveSetting() {
   } else {
     document.getElementById("e-setting-name").classList.remove("on");
   }
-  if (!code) {
+  if (hasCode && !code) {
     document.getElementById("e-setting-code").classList.add("on"); valid = false;
   } else {
     document.getElementById("e-setting-code").classList.remove("on");
