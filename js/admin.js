@@ -644,7 +644,7 @@ async function handleDeleteSetting(row, name, type) {
 // ══════════════════════════════════════════
 const addImages = { photo: null, birth: null };
 
-function openAddStudentModal() {
+async function openAddStudentModal() {
   // Reset all fields
   ["fullName","nationalId","family","parentPhone","studentPhone",
    "password","confirmPassword"].forEach(id => {
@@ -663,23 +663,29 @@ function openAddStudentModal() {
   // Clear errors
   document.querySelectorAll("[id^='e-add-']").forEach(el => el.classList.remove("on"));
 
-  // Fill dropdowns from options
+  // Fetch fresh options
+  let opts;
+  try {
+    opts = await apiGetOptions();
+  } catch (err) {
+    showToast("خطأ في تحميل البيانات", "error");
+    return;
+  }
+  
   const addStage   = document.getElementById("add-stage");
   const addService = document.getElementById("add-service");
   const addGender  = document.getElementById("add-gender");
-
+  
   addStage.innerHTML   = '<option value="">— اختر —</option>';
   addService.innerHTML = '<option value="">— اختر —</option>';
   addGender.innerHTML  = '<option value="">— اختر —</option>';
-
-  options.stage.forEach(v   => addStage.innerHTML   += `<option value="${v}">${v}</option>`);
-  options.service.forEach(v => addService.innerHTML += `<option value="${v}">${v}</option>`);
-  options.gender.forEach(v  => addGender.innerHTML  += `<option value="${v}">${v}</option>`);
-
-  // Fill competitions
-  fillChips("add-holy",  options.holy);
-  fillChips("add-sport", options.sport);
-
+  
+  opts.stage.forEach(v   => addStage.innerHTML   += `<option value="${v}">${v}</option>`);
+  opts.service.forEach(v => addService.innerHTML += `<option value="${v}">${v}</option>`);
+  opts.gender.forEach(v  => addGender.innerHTML  += `<option value="${v}">${v}</option>`);
+  
+  fillChips("add-holy",  opts.holy);
+  fillChips("add-sport", opts.sport);
   // Watch stage for kindergarten
   addStage.onchange = () => {
     const isKG = addStage.value === "حضانة";
