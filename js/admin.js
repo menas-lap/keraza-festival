@@ -77,235 +77,6 @@ function fillChips(groupId, values) {
 }
 
 // ══════════════════════════════════════════
-//  ADD STUDENT MODAL
-// ══════════════════════════════════════════
-const addImages = { photo: null, birth: null };
-
-function openAddStudentModal() {
-  // Reset all fields
-  ["fullName","nationalId","family","parentPhone","studentPhone",
-   "password","confirmPassword"].forEach(id => {
-    document.getElementById("add-" + id).value = "";
-  });
-  ["add-stage","add-service","add-gender","add-nationalIdOwner"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-  document.querySelectorAll("#add-holy input, #add-sport input")
-    .forEach(c => c.checked = false);
-  addImages.photo = null;
-  addImages.birth = null;
-  replaceAddImage("photo");
-  replaceAddImage("birth");
-
-  // Clear errors
-  document.querySelectorAll("[id^='e-add-']").forEach(el => el.classList.remove("on"));
-
-  // Fill dropdowns from options
-  const addStage   = document.getElementById("add-stage");
-  const addService = document.getElementById("add-service");
-  const addGender  = document.getElementById("add-gender");
-
-  addStage.innerHTML   = '<option value="">— اختر —</option>';
-  addService.innerHTML = '<option value="">— اختر —</option>';
-  addGender.innerHTML  = '<option value="">— اختر —</option>';
-
-  options.stage.forEach(v   => addStage.innerHTML   += `<option value="${v}">${v}</option>`);
-  options.service.forEach(v => addService.innerHTML += `<option value="${v}">${v}</option>`);
-  options.gender.forEach(v  => addGender.innerHTML  += `<option value="${v}">${v}</option>`);
-
-  // Fill competitions
-  fillChips("add-holy",  options.holy);
-  fillChips("add-sport", options.sport);
-
-  // Watch stage for kindergarten
-  addStage.onchange = () => {
-    const isKG = addStage.value === "حضانة";
-    document.getElementById("add-serviceField").style.display = isKG ? "none" : "block";
-    document.getElementById("add-ownerField").style.display   = isKG ? "block" : "none";
-  };
-
-  document.getElementById("addStudentModal").classList.add("open");
-}
-
-function closeAddStudentModal() {
-  document.getElementById("addStudentModal").classList.remove("open");
-}
-
-function handleAddFile(input, type) {
-  const file = input.files[0];
-  if (!file) return;
-  compressAddImage(file).then(base64 => {
-    addImages[type] = base64;
-    document.getElementById("add-img-"  + type).src = base64;
-    document.getElementById("add-prev-" + type).classList.add("on");
-    document.getElementById("add-zone-" + type).style.display = "none";
-    document.getElementById("e-add-"    + type).classList.remove("on");
-  });
-}
-
-function replaceAddImage(type) {
-  addImages[type] = null;
-  document.getElementById("add-img-"  + type).src = "";
-  document.getElementById("add-prev-" + type).classList.remove("on");
-  const zone = document.getElementById("add-zone-" + type);
-  zone.style.display = "";
-  zone.querySelector("input[type='file']").value = "";
-}
-
-function compressAddImage(file, maxWidth = 1200, quality = 0.75) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let w = img.width, h = img.height;
-        if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-async function handleAddStudent() {
-  const stage    = document.getElementById("add-stage").value;
-  const isKG     = stage === "حضانة";
-  const phoneReg = /^01[0-9]{9}$/;
-  let valid      = true;
-
-  const fail = (id, msg) => {
-    const err = document.getElementById("e-add-" + id);
-    if (msg) err.textContent = msg;
-    err.classList.add("on"); valid = false;
-  };
-  const pass = id => document.getElementById("e-add-" + id).classList.remove("on");
-
-  // Name
-  const name  = document.getElementById("add-fullName").value.trim();
-  const words = name.split(/\s+/).filter(w => w.length > 0);
-  if (!name)          fail("fullName", "هذا الحقل مطلوب");
-  else if (words.length < 4) fail("fullName", "يرجى كتابة الاسم الرباعي (٤ أسماء)");
-  else pass("fullName");
-
-  // Stage
-  if (!stage) fail("stage", "هذا الحقل مطلوب"); else pass("stage");
-
-  // Service (not required for KG)
-  const service = document.getElementById("add-service").value;
-  if (!isKG && !service) fail("service", "هذا الحقل مطلوب"); else pass("service");
-
-  // Gender
-  if (!document.getElementById("add-gender").value) fail("gender", "هذا الحقل مطلوب");
-  else pass("gender");
-
-  // Birth date
-  const birthVal = document.getElementById("add-birthDate").value;
-  if (!birthVal) fail("birthDate", "هذا الحقل مطلوب");
-  else {
-    const age = new Date().getFullYear() - new Date(birthVal).getFullYear();
-    if (age < 2 || age > 18) fail("birthDate", "العمر يجب أن يكون بين ٢ و ١٨ سنة");
-    else pass("birthDate");
-  }
-
-  // National ID
-  const nid = document.getElementById("add-nationalId").value.trim();
-  if (!/^\d{14}$/.test(nid)) fail("nationalId", "رقم قومي غير صحيح (14 رقم)");
-  else pass("nationalId");
-
-  // ID owner (KG only)
-  if (isKG && !document.getElementById("add-nationalIdOwner").value)
-    fail("nationalIdOwner", "هذا الحقل مطلوب");
-  else pass("nationalIdOwner");
-
-  // Parent phone
-  const parentPhone = document.getElementById("add-parentPhone").value.trim();
-  if (!parentPhone)                   fail("parentPhone", "هذا الحقل مطلوب");
-  else if (!phoneReg.test(parentPhone)) fail("parentPhone", "رقم غير صحيح");
-  else pass("parentPhone");
-
-  // Student phone (optional)
-  const studentPhone = document.getElementById("add-studentPhone").value.trim();
-  if (studentPhone && !phoneReg.test(studentPhone)) fail("studentPhone", "رقم غير صحيح");
-  else pass("studentPhone");
-
-  // Password
-  const pass1 = document.getElementById("add-password").value;
-  const pass2 = document.getElementById("add-confirmPassword").value;
-  if (!pass1 || pass1.length < 6) fail("password", "6 أحرف على الأقل");
-  else pass("password");
-  if (pass1 !== pass2) fail("confirmPassword", "كلمتا المرور غير متطابقتين");
-  else pass("confirmPassword");
-
-  // Images
-  ["photo", "birth"].forEach(type => {
-    if (!addImages[type]) {
-      document.getElementById("e-add-" + type).classList.add("on"); valid = false;
-    } else {
-      document.getElementById("e-add-" + type).classList.remove("on");
-    }
-  });
-
-  // Competitions
-  ["holy", "sport"].forEach(id => {
-    const checked = document.querySelectorAll(`#add-${id} input:checked`).length > 0;
-    document.getElementById("e-add-" + id).classList.toggle("on", !checked);
-    if (!checked) valid = false;
-  });
-
-  if (!valid) {
-    document.querySelector("#addStudentModal .ferr.on")
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-
-  const btn = document.getElementById("addStudentBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
-
-  const payload = {
-    fullName:        name,
-    stage,
-    service:         isKG ? "" : service,
-    gender:          document.getElementById("add-gender").value,
-    birthDate:       document.getElementById("add-birthDate").value,
-    family:          document.getElementById("add-family").value.trim(),
-    nationalId:      nid,
-    nationalIdOwner: isKG
-      ? document.getElementById("add-nationalIdOwner").value
-      : "self",
-    parentPhone,
-    studentPhone,
-    photo:           addImages.photo,
-    birthCert:       addImages.birth,
-    holy:  [...document.querySelectorAll("#add-holy input:checked")].map(c => c.value).join("\n"),
-    sport: [...document.querySelectorAll("#add-sport input:checked")].map(c => c.value).join("\n"),
-    password: pass1,
-  };
-
-  try {
-    const res = await apiRegister(payload);
-    if (res.success) {
-      showToast(`تم إضافة الطالب بنجاح — ${res.id} ✅`, "success");
-      closeAddStudentModal();
-      await loadStudents();
-    } else if (res.reason === "duplicate_id") {
-      showToast("الرقم القومي ده مسجل من قبل", "error");
-    } else {
-      showToast("حدث خطأ، حاول مرة أخرى", "error");
-    }
-  } catch (err) {
-    showToast("حدث خطأ، تأكد من الاتصال", "error");
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = "إضافة الطالب ☩";
-}
-
-// ══════════════════════════════════════════
 //  LOAD STUDENTS
 // ══════════════════════════════════════════
 async function loadStudents() {
@@ -866,6 +637,235 @@ async function handleDeleteSetting(row, name, type) {
   } catch (err) {
     showToast("حدث خطأ، تأكد من الاتصال", "error");
   }
+}
+
+// ══════════════════════════════════════════
+//  ADD STUDENT MODAL
+// ══════════════════════════════════════════
+const addImages = { photo: null, birth: null };
+
+function openAddStudentModal() {
+  // Reset all fields
+  ["fullName","nationalId","family","parentPhone","studentPhone",
+   "password","confirmPassword"].forEach(id => {
+    document.getElementById("add-" + id).value = "";
+  });
+  ["add-stage","add-service","add-gender","add-nationalIdOwner"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.querySelectorAll("#add-holy input, #add-sport input")
+    .forEach(c => c.checked = false);
+  addImages.photo = null;
+  addImages.birth = null;
+  replaceAddImage("photo");
+  replaceAddImage("birth");
+
+  // Clear errors
+  document.querySelectorAll("[id^='e-add-']").forEach(el => el.classList.remove("on"));
+
+  // Fill dropdowns from options
+  const addStage   = document.getElementById("add-stage");
+  const addService = document.getElementById("add-service");
+  const addGender  = document.getElementById("add-gender");
+
+  addStage.innerHTML   = '<option value="">— اختر —</option>';
+  addService.innerHTML = '<option value="">— اختر —</option>';
+  addGender.innerHTML  = '<option value="">— اختر —</option>';
+
+  options.stage.forEach(v   => addStage.innerHTML   += `<option value="${v}">${v}</option>`);
+  options.service.forEach(v => addService.innerHTML += `<option value="${v}">${v}</option>`);
+  options.gender.forEach(v  => addGender.innerHTML  += `<option value="${v}">${v}</option>`);
+
+  // Fill competitions
+  fillChips("add-holy",  options.holy);
+  fillChips("add-sport", options.sport);
+
+  // Watch stage for kindergarten
+  addStage.onchange = () => {
+    const isKG = addStage.value === "حضانة";
+    document.getElementById("add-serviceField").style.display = isKG ? "none" : "block";
+    document.getElementById("add-ownerField").style.display   = isKG ? "block" : "none";
+  };
+
+  document.getElementById("addStudentModal").classList.add("open");
+}
+
+function closeAddStudentModal() {
+  document.getElementById("addStudentModal").classList.remove("open");
+}
+
+function handleAddFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  compressAddImage(file).then(base64 => {
+    addImages[type] = base64;
+    document.getElementById("add-img-"  + type).src = base64;
+    document.getElementById("add-prev-" + type).classList.add("on");
+    document.getElementById("add-zone-" + type).style.display = "none";
+    document.getElementById("e-add-"    + type).classList.remove("on");
+  });
+}
+
+function replaceAddImage(type) {
+  addImages[type] = null;
+  document.getElementById("add-img-"  + type).src = "";
+  document.getElementById("add-prev-" + type).classList.remove("on");
+  const zone = document.getElementById("add-zone-" + type);
+  zone.style.display = "";
+  zone.querySelector("input[type='file']").value = "";
+}
+
+function compressAddImage(file, maxWidth = 1200, quality = 0.75) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleAddStudent() {
+  const stage    = document.getElementById("add-stage").value;
+  const isKG     = stage === "حضانة";
+  const phoneReg = /^01[0-9]{9}$/;
+  let valid      = true;
+
+  const fail = (id, msg) => {
+    const err = document.getElementById("e-add-" + id);
+    if (msg) err.textContent = msg;
+    err.classList.add("on"); valid = false;
+  };
+  const pass = id => document.getElementById("e-add-" + id).classList.remove("on");
+
+  // Name
+  const name  = document.getElementById("add-fullName").value.trim();
+  const words = name.split(/\s+/).filter(w => w.length > 0);
+  if (!name)          fail("fullName", "هذا الحقل مطلوب");
+  else if (words.length < 4) fail("fullName", "يرجى كتابة الاسم الرباعي (٤ أسماء)");
+  else pass("fullName");
+
+  // Stage
+  if (!stage) fail("stage", "هذا الحقل مطلوب"); else pass("stage");
+
+  // Service (not required for KG)
+  const service = document.getElementById("add-service").value;
+  if (!isKG && !service) fail("service", "هذا الحقل مطلوب"); else pass("service");
+
+  // Gender
+  if (!document.getElementById("add-gender").value) fail("gender", "هذا الحقل مطلوب");
+  else pass("gender");
+
+  // Birth date
+  const birthVal = document.getElementById("add-birthDate").value;
+  if (!birthVal) fail("birthDate", "هذا الحقل مطلوب");
+  else {
+    const age = new Date().getFullYear() - new Date(birthVal).getFullYear();
+    if (age < 2 || age > 18) fail("birthDate", "العمر يجب أن يكون بين ٢ و ١٨ سنة");
+    else pass("birthDate");
+  }
+
+  // National ID
+  const nid = document.getElementById("add-nationalId").value.trim();
+  if (!/^\d{14}$/.test(nid)) fail("nationalId", "رقم قومي غير صحيح (14 رقم)");
+  else pass("nationalId");
+
+  // ID owner (KG only)
+  if (isKG && !document.getElementById("add-nationalIdOwner").value)
+    fail("nationalIdOwner", "هذا الحقل مطلوب");
+  else pass("nationalIdOwner");
+
+  // Parent phone
+  const parentPhone = document.getElementById("add-parentPhone").value.trim();
+  if (!parentPhone)                   fail("parentPhone", "هذا الحقل مطلوب");
+  else if (!phoneReg.test(parentPhone)) fail("parentPhone", "رقم غير صحيح");
+  else pass("parentPhone");
+
+  // Student phone (optional)
+  const studentPhone = document.getElementById("add-studentPhone").value.trim();
+  if (studentPhone && !phoneReg.test(studentPhone)) fail("studentPhone", "رقم غير صحيح");
+  else pass("studentPhone");
+
+  // Password
+  const pass1 = document.getElementById("add-password").value;
+  const pass2 = document.getElementById("add-confirmPassword").value;
+  if (!pass1 || pass1.length < 6) fail("password", "6 أحرف على الأقل");
+  else pass("password");
+  if (pass1 !== pass2) fail("confirmPassword", "كلمتا المرور غير متطابقتين");
+  else pass("confirmPassword");
+
+  // Images
+  ["photo", "birth"].forEach(type => {
+    if (!addImages[type]) {
+      document.getElementById("e-add-" + type).classList.add("on"); valid = false;
+    } else {
+      document.getElementById("e-add-" + type).classList.remove("on");
+    }
+  });
+
+  // Competitions
+  ["holy", "sport"].forEach(id => {
+    const checked = document.querySelectorAll(`#add-${id} input:checked`).length > 0;
+    document.getElementById("e-add-" + id).classList.toggle("on", !checked);
+    if (!checked) valid = false;
+  });
+
+  if (!valid) {
+    document.querySelector("#addStudentModal .ferr.on")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  const btn = document.getElementById("addStudentBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري الإضافة...';
+
+  const payload = {
+    fullName:        name,
+    stage,
+    service:         isKG ? "" : service,
+    gender:          document.getElementById("add-gender").value,
+    birthDate:       document.getElementById("add-birthDate").value,
+    family:          document.getElementById("add-family").value.trim(),
+    nationalId:      nid,
+    nationalIdOwner: isKG
+      ? document.getElementById("add-nationalIdOwner").value
+      : "self",
+    parentPhone,
+    studentPhone,
+    photo:           addImages.photo,
+    birthCert:       addImages.birth,
+    holy:  [...document.querySelectorAll("#add-holy input:checked")].map(c => c.value).join("\n"),
+    sport: [...document.querySelectorAll("#add-sport input:checked")].map(c => c.value).join("\n"),
+    password: pass1,
+  };
+
+  try {
+    const res = await apiRegister(payload);
+    if (res.success) {
+      showToast(`تم إضافة الطالب بنجاح — ${res.id} ✅`, "success");
+      closeAddStudentModal();
+      await loadStudents();
+    } else if (res.reason === "duplicate_id") {
+      showToast("الرقم القومي ده مسجل من قبل", "error");
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = "إضافة الطالب ☩";
 }
 
 // ══════════════════════════════════════════
