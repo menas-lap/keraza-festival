@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مهرجان الكرازة — الخادم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="dashboard">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="cross">☩</span>
+        <h2>مهرجان الكرازة</h2>
+        <p id="servantName">...</p>
+        <p id="servantInfo" style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:2px;">...</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="showTab('students')">
+          👥 المخدومين
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger" style="width:100%" onclick="logout()">
+          تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <main class="main-content">
+
+      <!-- ── Students Tab ── -->
+      <div id="tab-students" class="screen active">
+        <div class="page-title">👥 المخدومين</div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <input class="search-input" id="searchInput"
+            placeholder="ابحث بالاسم أو الرقم القومي..."
+            oninput="filterStudents()">
+          <select class="search-input" id="filterStage"
+            style="flex:0;min-width:160px;" onchange="filterStudents()">
+            <option value="">كل المراحل</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الرقم</th>
+                <th>الاسم</th>
+                <th>المرحلة</th>
+                <th>النوع</th>
+                <th>تليفون ولي الأمر</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <tr><td colspan="6" class="page-loading">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ══ STUDENT DETAIL MODAL ══ -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <div class="modal-title" id="modalStudentName">بيانات الطالب</div>
+
+      <!-- Photos -->
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <img id="modal-photo" src="" alt=""
+            style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);display:none;">
+          <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px;">صورة شخصية</div>
+        </div>
+        <div style="text-align:center;">
+          <img id="modal-birth" src="" alt=""
+            style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:2px solid var(--border);display:none;">
+          <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px;">شهادة ميلاد</div>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div class="info-item"><div class="info-label">الرقم</div><div class="info-value" id="m-id">—</div></div>
+        <div class="info-item"><div class="info-label">الاسم</div><div class="info-value" id="m-name">—</div></div>
+        <div class="info-item"><div class="info-label">المرحلة</div><div class="info-value" id="m-stage">—</div></div>
+        <div class="info-item"><div class="info-label">الخدمة</div><div class="info-value" id="m-service">—</div></div>
+        <div class="info-item"><div class="info-label">النوع</div><div class="info-value" id="m-gender">—</div></div>
+        <div class="info-item"><div class="info-label">تاريخ الميلاد</div><div class="info-value" id="m-birth">—</div></div>
+        <div class="info-item"><div class="info-label">الأسرة</div><div class="info-value" id="m-family">—</div></div>
+        <div class="info-item"><div class="info-label">تليفون ولي الأمر</div><div class="info-value" id="m-parentPhone">—</div></div>
+        <div class="info-item"><div class="info-label">تليفون المخدوم</div><div class="info-value" id="m-studentPhone">—</div></div>
+        <div class="info-item"><div class="info-label">الرقم القومي</div><div class="info-value" id="m-nid">—</div></div>
+      </div>
+
+      <!-- Competitions -->
+      <div style="margin-bottom:16px;">
+        <div class="info-label" style="margin-bottom:6px;">الروحي</div>
+        <div id="m-holy" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="info-label" style="margin-bottom:6px;">الرياضي</div>
+        <div id="m-sport" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+      </div>
+
+      <!-- Change Password -->
+      <div style="border-top:1px solid var(--cream-dark);padding-top:16px;margin-bottom:8px;">
+        <div class="info-label" style="margin-bottom:8px;">تغيير كلمة المرور</div>
+        <div style="display:flex;gap:8px;">
+          <input type="password" id="modal-newPassword"
+            placeholder="كلمة المرور الجديدة"
+            style="flex:1;padding:9px 12px;border:1.5px solid var(--border-light);border-radius:8px;font-family:'Cairo',serif;font-size:0.88rem;outline:none;">
+          <button class="btn btn-secondary btn-sm" onclick="handleModalChangePassword()">
+            حفظ
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button class="btn btn-danger btn-sm" onclick="handleDeleteStudent()">
+          🗑️ حذف الحساب
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <style>
+    .info-item {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .info-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+    .info-value {
+      font-size: 0.88rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+  </style>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/servant.js"></script>
+</body>
+</html>
