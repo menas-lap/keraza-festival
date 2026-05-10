@@ -483,10 +483,7 @@ async function loadSettings() {
 
 function renderSettingsTable(type) {
   const tbody = document.getElementById("settings-" + type);
-  const items = currentSettings[type] || [];
-
   if (!tbody) return;
-
   const items = currentSettings[type] || [];
 
   if (items.length === 0) {
