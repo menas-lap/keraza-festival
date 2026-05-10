@@ -667,8 +667,17 @@ async function openAddStudentModal() {
   let opts;
   try {
     opts = await apiGetOptions();
+    if (!opts.success) {
+      showToast("خطأ في تحميل البيانات", "error");
+      return;
+    }
   } catch (err) {
     showToast("خطأ في تحميل البيانات", "error");
+    return;
+  }
+
+  if (!opts || !opts.stage || !opts.service) {
+    showToast("خطأ في تحميل البيانات، يرجي المحاولة مرة أخري", "error");
     return;
   }
   
