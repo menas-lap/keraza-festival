@@ -2,6 +2,7 @@
 //  INIT
 // ══════════════════════════════════════════
 const session = requireRole("admin");
+await loadSettings();
 let allStudents    = [];
 let allServants    = [];
 let currentStudent = null;
@@ -448,10 +449,178 @@ function showTab(tab, btn) {
   document.getElementById("tab-" + tab).classList.add("active");
   btn.classList.add("active");
   document.getElementById("sidebar").classList.remove("open");
+
+  // Load settings fresh every time tab opens
+  if (tab === "settings") loadSettings();
 }
 
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("open");
+}
+
+// ══════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════
+let currentSettings  = {};
+let settingModalMode = null; // "add" or "edit"
+let settingModalType = null; // "service" / "stage" / "gender"
+let settingModalRow  = null; // row number in sheet (for edit)
+
+async function loadSettings() {
+  try {
+    const res = await apiGetSettings();
+    if (!res.success) throw new Error(res.reason);
+    currentSettings = res.settings;
+    renderSettingsTable("service");
+    renderSettingsTable("stage");
+    renderSettingsTable("gender");
+  } catch (err) {
+    showToast("خطأ في تحميل الإعدادات", "error");
+  }
+}
+
+function renderSettingsTable(type) {
+  const tbody = document.getElementById("settings-" + type);
+  const items = currentSettings[type] || [];
+
+  if (items.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="3"
+        style="text-align:center;color:var(--text-secondary);padding:16px;">
+        لا يوجد بيانات
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => `
+    <tr>
+      <td style="font-weight:600;">${item.name}</td>
+      <td>
+        <span class="badge badge-gold" style="font-family:monospace;letter-spacing:2px;">
+          ${item.code}
+        </span>
+      </td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm"
+          onclick="openEditModal('${type}', ${item.row}, '${item.name}', '${item.code}')">
+          ✏️ تعديل
+        </button>
+        <button class="btn btn-danger btn-sm"
+          onclick="handleDeleteSetting(${item.row}, '${item.name}', '${type}')">
+          🗑️
+        </button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// ── Open Add Modal ──
+function openAddModal(type) {
+  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع" };
+  settingModalMode = "add";
+  settingModalType = type;
+  settingModalRow  = null;
+
+  document.getElementById("settingModalTitle").textContent =
+    "إضافة " + typeNames[type];
+  document.getElementById("setting-name").value = "";
+  document.getElementById("setting-code").value = "";
+  document.getElementById("e-setting-name").classList.remove("on");
+  document.getElementById("e-setting-code").classList.remove("on");
+  document.getElementById("settingModalBtn").textContent = "إضافة";
+  document.getElementById("settingModal").classList.add("open");
+}
+
+// ── Open Edit Modal ──
+function openEditModal(type, row, name, code) {
+  const typeNames = { service: "خدمة", stage: "مرحلة", gender: "نوع" };
+  settingModalMode = "edit";
+  settingModalType = type;
+  settingModalRow  = row;
+
+  document.getElementById("settingModalTitle").textContent =
+    "تعديل " + typeNames[type];
+  document.getElementById("setting-name").value = name;
+  document.getElementById("setting-code").value = code;
+  document.getElementById("e-setting-name").classList.remove("on");
+  document.getElementById("e-setting-code").classList.remove("on");
+  document.getElementById("settingModalBtn").textContent = "حفظ التعديل";
+  document.getElementById("settingModal").classList.add("open");
+}
+
+function closeSettingModal() {
+  document.getElementById("settingModal").classList.remove("open");
+}
+
+// ── Save (Add or Edit) ──
+async function handleSaveSetting() {
+  const name = document.getElementById("setting-name").value.trim();
+  const code = document.getElementById("setting-code").value.trim();
+  const btn  = document.getElementById("settingModalBtn");
+
+  // Validate
+  let valid = true;
+  if (!name) {
+    document.getElementById("e-setting-name").classList.add("on"); valid = false;
+  } else {
+    document.getElementById("e-setting-name").classList.remove("on");
+  }
+  if (!code) {
+    document.getElementById("e-setting-code").classList.add("on"); valid = false;
+  } else {
+    document.getElementById("e-setting-code").classList.remove("on");
+  }
+  if (!valid) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    let res;
+    if (settingModalMode === "add") {
+      res = await apiAddSetting(settingModalType, name, code);
+      if (res.reason === "duplicate_name") {
+        showToast("الاسم ده موجود بالفعل", "error");
+        btn.disabled = false;
+        btn.textContent = "إضافة";
+        return;
+      }
+    } else {
+      res = await apiUpdateSetting(settingModalRow, name, code);
+    }
+
+    if (res.success) {
+      showToast("تم الحفظ ✅", "success");
+      closeSettingModal();
+      await loadSettings();
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
+
+  btn.disabled = false;
+  btn.textContent = settingModalMode === "add" ? "إضافة" : "حفظ التعديل";
+}
+
+// ── Delete ──
+async function handleDeleteSetting(row, name, type) {
+  const confirmed = window.confirm(`هل أنت متأكد من حذف "${name}"؟`);
+  if (!confirmed) return;
+
+  try {
+    const res = await apiDeleteSetting(row);
+    if (res.success) {
+      showToast("تم الحذف ✅", "success");
+      await loadSettings();
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
 }
 
 // ══════════════════════════════════════════
