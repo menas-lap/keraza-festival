@@ -314,6 +314,32 @@
     </div>
   </div>
 
+  <!-- ══ ADD / EDIT SETTING MODAL ══ -->
+  <div class="modal-overlay" id="settingModal">
+    <div class="modal" style="max-width:360px;">
+      <div class="modal-title" id="settingModalTitle">إضافة</div>
+  
+      <div class="field">
+        <label>الاسم بالعربي <span class="req">*</span></label>
+        <input type="text" id="setting-name" placeholder="مثال: أبو سيفين">
+        <div class="ferr" id="e-setting-name">هذا الحقل مطلوب</div>
+      </div>
+  
+      <div class="field">
+        <label>الكود <span class="req">*</span></label>
+        <input type="text" id="setting-code" placeholder="مثال: A"
+          maxlength="3" dir="ltr" style="text-align:right;">
+        <div class="ferr" id="e-setting-code">هذا الحقل مطلوب</div>
+      </div>
+  
+      <div class="modal-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeSettingModal()">إلغاء</button>
+        <button class="btn btn-primary btn-sm" id="settingModalBtn"
+          onclick="handleSaveSetting()">حفظ</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
