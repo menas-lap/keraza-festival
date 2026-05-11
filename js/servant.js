@@ -58,36 +58,39 @@ async function loadStudents() {
 // ══════════════════════════════════════════
 //  SAVE STUDENT EDITS
 // ══════════════════════════════════════════
-async function handleSaveStudent() {
-  if (!currentStudent) return;
+async function handleSaveCompetitions() {
+  const btn  = document.getElementById("saveCompBtn");
+  const holy  = [...document.querySelectorAll("#edit-comp-holy input:checked")]
+    .map(c => c.value).join("\n");
+  const sport = [...document.querySelectorAll("#edit-comp-sport input:checked")]
+    .map(c => c.value).join("\n");
 
-  const btn = document.getElementById("saveEditBtn");
+  if (!holy || !sport) {
+    showToast("يرجى اختيار مسابقة روحية ورياضية على الأقل", "error");
+    return;
+  }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
 
-  const holy  = [...document.querySelectorAll("#edit-holy input:checked")].map(c => c.value).join("\n");
-  const sport = [...document.querySelectorAll("#edit-sport input:checked")].map(c => c.value).join("\n");
-
-  const payload = {
-    studentId:    currentStudent.student_id,
-    full_name:    document.getElementById("edit-fullName").value.trim(),
-    stage:        document.getElementById("edit-stage").value,
-    service:      document.getElementById("edit-service").value,
-    gender:       document.getElementById("edit-gender").value,
-    birth_date:   document.getElementById("edit-birthDate").value,
-    family:       document.getElementById("edit-family").value.trim(),
-    parent_phone: document.getElementById("edit-parentPhone").value.trim(),
-    student_phone:document.getElementById("edit-studentPhone").value.trim(),
-    national_id:  document.getElementById("edit-nationalId").value.trim(),
-    holy,
-    sport,
-  };
-
   try {
-    const res = await apiUpdateStudent(payload);
+    const res = await apiUpdateStudent({
+      studentId: session.student.student_id,
+      holy,
+      sport
+    });
+
     if (res.success) {
-      showToast("تم حفظ التعديلات ✅", "success");
-      await loadStudents();
+      // Update session
+      session.student.holy  = holy;
+      session.student.sport = sport;
+      saveSession(session);
+
+      // Update view mode badges too
+      renderCompetition("holy",  holy);
+      renderCompetition("sport", sport);
+
+      showToast("تم حفظ المسابقات ✅", "success");
     } else {
       showToast("حدث خطأ، حاول مرة أخرى", "error");
     }
@@ -96,7 +99,7 @@ async function handleSaveStudent() {
   }
 
   btn.disabled = false;
-  btn.innerHTML = "💾 حفظ التعديلات";
+  btn.innerHTML = "💾 حفظ المسابقات";
 }
 
 // ══════════════════════════════════════════
