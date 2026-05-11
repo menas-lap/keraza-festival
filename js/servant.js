@@ -4,6 +4,7 @@
 const session = requireRole("servant");
 let allStudents    = [];
 let currentStudent = null;
+let toggles = {};
 
 if (session) init();
 
@@ -12,6 +13,15 @@ async function init() {
   document.getElementById("servantName").textContent = session.name;
   document.getElementById("servantInfo").textContent =
     session.service + " — " + session.stages.replace(/\n/g, " / ");
+
+  // Load toggles + options
+  try {
+    const opts     = await apiGetOptions();
+    toggles        = opts.toggles || { servant_edit: false };
+    servantOptions = opts;
+  } catch (err) {
+    toggles = { servant_edit: false };
+  }
 
   // Fill stage filter from servant's stages
   const stageFilter = document.getElementById("filterStage");
@@ -147,7 +157,7 @@ function openStudentModal(studentId) {
   else birth.style.display = "none";
 
   // Info
-  document.getElementById("m-id").textContent          = s.student_id      || "—";
+  document.getElementById("m-id").textContent           = s.student_id      || "—";
   document.getElementById("m-name").textContent         = s.full_name       || "—";
   document.getElementById("m-stage").textContent        = s.stage           || "—";
   document.getElementById("m-service").textContent      = s.service         || "—";
@@ -158,9 +168,32 @@ function openStudentModal(studentId) {
   document.getElementById("m-studentPhone").textContent = s.student_phone   || "—";
   document.getElementById("m-nid").textContent          = s.national_id     || "—";
 
-  // Competitions
-  renderBadges("m-holy",  s.holy);
-  renderBadges("m-sport", s.sport);
+  // Apply servant toggle
+  const canEdit          = toggles.servant_edit;
+  const compEdit         = document.getElementById("modal-comp-edit");
+  const compView         = document.getElementById("modal-comp-view");
+  const compLocked       = document.getElementById("modal-comp-locked");
+  const holyView         = document.getElementById("m-holy-view");
+  const sportView        = document.getElementById("m-sport-view");
+
+  if (canEdit) {
+    if (compLocked)  compLocked.style.display  = "none";
+    if (compView)    compView.style.display    = "none";
+    if (compEdit)    compEdit.style.display    = "block";
+
+    // Fill checkboxes with current selections
+    fillModalChips("m-holy",  servantOptions.holy  || [], s.holy);
+    fillModalChips("m-sport", servantOptions.sport || [], s.sport);
+    
+  } else {
+    if (compLocked)  compLocked.style.display  = "block";
+    if (compView)    compView.style.display  = "block";
+    if (compEdit)    compEdit.style.display  = "none";
+
+    // Competitions
+    renderBadges("m-holy",  s.holy);
+    renderBadges("m-sport", s.sport);
+  }
 
   // Clear password field
   document.getElementById("modal-newPassword").value = "";
@@ -496,6 +529,21 @@ function driveThumb(url) {
   const match = url.match(/\/d\/([^/]+)\//);
   if (!match) return url;
   return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
+}
+
+function fillModalChips(groupId, allOptions, selected) {
+  const el           = document.getElementById(groupId);
+  if (!el) return;
+  const selectedList = selected ? selected.split("\n").map(v => v.trim()) : [];
+
+  el.innerHTML = "";
+  allOptions.forEach(v => {
+    const label = document.createElement("label");
+    label.className = "chip";
+    const checked   = selectedList.include(v) ? "checked" : "";
+    label.innerHTML = `<input type="checkbox" value="${v}" ${checked}><span>${v}</span>`;
+    el.appendChild(label);
+  });
 }
 
 // ══════════════════════════════════════════
