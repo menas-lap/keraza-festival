@@ -109,3 +109,10 @@ async function apiAddSetting(type, name, code) {
 async function apiDeleteSetting(row) {
   return apiPost({ action: "deleteSetting", row });
 }
+
+// ══════════════════════════════════════════
+//  UPDATE TOGGLE
+// ══════════════════════════════════════════
+async function apiUpdateToggle(name, value) {
+  return apiPost({ action: "updateToggle", name, value });
+}
