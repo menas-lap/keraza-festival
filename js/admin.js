@@ -457,7 +457,10 @@ function showTab(tab, btn) {
   document.getElementById("sidebar").classList.remove("open");
 
   // Load settings fresh every time tab opens
-  if (tab === "settings") loadSettings();
+  if (tab === "settings") {
+    loadSettings();
+    loadToggles();
+  }
 }
 
 function toggleSidebar() {
