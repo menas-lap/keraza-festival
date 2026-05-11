@@ -231,9 +231,15 @@ function openStudentModal(studentId) {
   // Photos
   const photo = document.getElementById("modal-photo");
   const birth = document.getElementById("modal-birth");
-  if (s.personal_photo) { photo.src = s.personal_photo; photo.style.display = "block"; }
+  if (s.personal_photo) {
+    photo.src = driveThumb(s.personal_photo);
+    photo.style.display = "block";
+  }
   else photo.style.display = "none";
-  if (s.birth_cert) { birth.src = s.birth_cert; birth.style.display = "block"; }
+  if (s.birth_cert) {
+    birth.src = driveThumb(s.birth_cert);
+    birth.style.display = "block";
+  }
   else birth.style.display = "none";
 
   // Fill editable fields
@@ -887,6 +893,16 @@ async function handleAddStudent() {
 
   btn.disabled = false;
   btn.innerHTML = "إضافة الطالب ☩";
+}
+
+// ══════════════════════════════════════════
+//  HELPER FUNCTIONS
+// ══════════════════════════════════════════
+function driveThumb(url) {
+  if (!url) return "";
+  const match = url.match(/\/d\/([^/]+)\//);
+  if (!match) return url;
+  return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
 }
 
 // ══════════════════════════════════════════
