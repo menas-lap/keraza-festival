@@ -914,3 +914,42 @@ function showToast(msg, type = "success") {
   toast.className   = `toast ${type} show`;
   setTimeout(() => toast.classList.remove("show"), 3500);
 }
+
+// ══════════════════════════════════════════
+//  TOGGLES
+// ══════════════════════════════════════════
+let currentToggles = {};
+
+async function loadToggles() {
+  try {
+    const opts     = await apiGetOptions();
+    currentToggles = opts.toggles || {};
+    renderToggles();
+  } catch (err) {
+    showToast("خطأ في تحميل الإعدادات", "error");
+  }
+}
+
+function renderToggles() {
+  Object.entries(currentToggles).forEach(([name, value]) => {
+    const btn = document.getElementById("toggle-" + name);
+    if (!btn) return;
+    btn.classList.toggle("on", value);
+  });
+}
+
+async function handleToggle(name) {
+  const newValue = !currentToggles[name];
+  try {
+    const res = await apiUpdateToggle(name, newValue);
+    if (res.success) {
+      currentToggles[name] = newValue;
+      renderToggles();
+      showToast(newValue ? "تم التفعيل ✅" : "تم الإيقاف ✅", "success");
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
+}
