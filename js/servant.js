@@ -600,6 +600,7 @@ function fillModalChips(groupId, allOptions, selected) {
     label.innerHTML = `<input type="checkbox" value="${v}" ${checked}><span>${v}</span>`;
     el.appendChild(label);
   });
+}
 
 function normalizeDateForInput(value) {
   if (!value) return "";
