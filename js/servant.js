@@ -540,7 +540,7 @@ function fillModalChips(groupId, allOptions, selected) {
   allOptions.forEach(v => {
     const label = document.createElement("label");
     label.className = "chip";
-    const checked   = selectedList.include(v) ? "checked" : "";
+    const checked   = selectedList.includes(v) ? "checked" : "";
     label.innerHTML = `<input type="checkbox" value="${v}" ${checked}><span>${v}</span>`;
     el.appendChild(label);
   });
