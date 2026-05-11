@@ -16,12 +16,12 @@ function loadStudentData() {
   // Photos
   if (s.personal_photo) {
     const img = document.getElementById("profilePhoto");
-    img.src = s.personal_photo;
+    img.src = driveThumb(s.personal_photo);
     img.style.display = "block";
   }
   if (s.birth_cert) {
     const img = document.getElementById("birthCertImg");
-    img.src = s.birth_cert;
+    img.src = driveThumb(s.birth_cert);
     img.style.display = "block";
   }
 
@@ -31,7 +31,7 @@ function loadStudentData() {
     stage:       s.stage,
     service:     s.service,
     gender:      s.gender,
-    birthDate:   s.birth_date,
+    birthDate:   s.birth_date ? String(s.birth_date).split("T")[0] : "—",
     family:      s.family      || "—",
     parentPhone: s.parent_phone,
     studentPhone:s.student_phone || "—",
@@ -144,6 +144,16 @@ async function handleChangePassword() {
 // ══════════════════════════════════════════
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("open");
+}
+
+// ══════════════════════════════════════════
+//  HELPER FUNCTIONS
+// ══════════════════════════════════════════
+function driveThumb(url) {
+  if (!url) return "";
+  const match = url.match(/\/d\/([^/]+)\//);
+  if (!match) return url;
+  return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
 }
 
 // ══════════════════════════════════════════
