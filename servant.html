@@ -116,13 +116,35 @@
       </div>
 
       <!-- Competitions -->
-      <div style="margin-bottom:16px;">
-        <div class="info-label" style="margin-bottom:6px;">الروحي</div>
-        <div id="m-holy" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+      <!-- Locked notice -->
+      <div id="modal-comp-locked" style="display:none;
+        background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;
+        padding:12px 16px;color:#7B6000;font-size:0.85rem;margin-bottom:12px;">
+        🔒 تعديل المسابقات مغلق من قِبَل الإدارة
       </div>
-      <div style="margin-bottom:16px;">
-        <div class="info-label" style="margin-bottom:6px;">الرياضي</div>
-        <div id="m-sport" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+      
+      <!-- View only (when locked) -->
+      <div id="modal-comp-view" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <div class="info-label" style="margin-bottom:6px;">الروحي</div>
+          <div id="m-holy-view" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div class="info-label" style="margin-bottom:6px;">الرياضي</div>
+          <div id="m-sport-view" style="display:flex;flex-wrap:wrap;gap:6px;">—</div>
+        </div>
+      </div>
+      
+      <!-- Edit (when open) -->
+      <div id="modal-comp-edit">
+        <div style="margin-bottom:12px;">
+          <div class="info-label" style="margin-bottom:6px;">الروحي</div>
+          <div id="m-holy" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div class="info-label" style="margin-bottom:6px;">الرياضي</div>
+          <div id="m-sport" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
       </div>
 
       <!-- Change Password -->
