@@ -56,6 +56,50 @@ async function loadStudents() {
 }
 
 // ══════════════════════════════════════════
+//  SAVE STUDENT EDITS
+// ══════════════════════════════════════════
+async function handleSaveStudent() {
+  if (!currentStudent) return;
+
+  const btn = document.getElementById("saveEditBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري الحفظ...';
+
+  const holy  = [...document.querySelectorAll("#edit-holy input:checked")].map(c => c.value).join("\n");
+  const sport = [...document.querySelectorAll("#edit-sport input:checked")].map(c => c.value).join("\n");
+
+  const payload = {
+    studentId:    currentStudent.student_id,
+    full_name:    document.getElementById("edit-fullName").value.trim(),
+    stage:        document.getElementById("edit-stage").value,
+    service:      document.getElementById("edit-service").value,
+    gender:       document.getElementById("edit-gender").value,
+    birth_date:   document.getElementById("edit-birthDate").value,
+    family:       document.getElementById("edit-family").value.trim(),
+    parent_phone: document.getElementById("edit-parentPhone").value.trim(),
+    student_phone:document.getElementById("edit-studentPhone").value.trim(),
+    national_id:  document.getElementById("edit-nationalId").value.trim(),
+    holy,
+    sport,
+  };
+
+  try {
+    const res = await apiUpdateStudent(payload);
+    if (res.success) {
+      showToast("تم حفظ التعديلات ✅", "success");
+      await loadStudents();
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = "💾 حفظ التعديلات";
+}
+
+// ══════════════════════════════════════════
 //  STATS
 // ══════════════════════════════════════════
 function renderStats() {
