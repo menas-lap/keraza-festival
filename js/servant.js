@@ -588,6 +588,19 @@ function driveThumb(url) {
   return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
 }
 
+function fillModalChips(groupId, allOptions, selected) {
+  const el           = document.getElementById(groupId);
+  if (!el) return;
+  const selectedList = selected ? selected.split("\n").map(v => v.trim()) : [];
+  el.innerHTML = "";
+  allOptions.forEach(v => {
+    const label = document.createElement("label");
+    label.className = "chip";
+    const checked   = selectedList.includes(v) ? "checked" : "";
+    label.innerHTML = `<input type="checkbox" value="${v}" ${checked}><span>${v}</span>`;
+    el.appendChild(label);
+  });
+
 function normalizeDateForInput(value) {
   if (!value) return "";
 
