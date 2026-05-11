@@ -44,3 +44,15 @@ function redirectByRole(role) {
   };
   window.location.href = routes[role] || "index.html";
 }
+
+// ══════════════════════════════════════════
+//  TOGGLES - Save & get
+// ══════════════════════════════════════════
+function saveToggles(toggles) {
+  localStorage.setItem("keraza_toggles", JSON.stringify(toggles));
+}
+
+function getToggles() {
+  const raw = localStorage.getItem("keraza_toggles");
+  return raw ? JSON.parse(raw) : { student_edit: true, servant_edit: true };
+}
