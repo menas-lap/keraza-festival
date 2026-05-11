@@ -2,7 +2,20 @@
 //  INIT
 // ══════════════════════════════════════════
 const session = requireRole("student");
-if (session) loadStudentData();
+let toggles   = {};
+
+if (session) init();
+
+async function init() {
+  try {
+    const opts = await apiGetOptions();
+    toggles    = opts.toggles || { student_edit: true };
+  } catch (err) {
+    toggles = { student_edit: true };
+  }
+  loadStudentData();
+  applyStudentToggle();
+}
 
 function loadStudentData() {
   const s = session.student;
@@ -62,12 +75,40 @@ function renderCompetition(id, value) {
 }
 
 // ══════════════════════════════════════════
+//  APPLY TOGGLES
+// ══════════════════════════════════════════
+function applyStudentToggle() {
+  const canEdit = toggles.student_edit;
+  const tab     = document.querySelector(".nav-item:nth-child(2)"); // competitions tab
+  const notice  = document.getElementById("competitions-locked-notice");
+
+  if (!canEdit) {
+    // Make competition chips view only
+    document.querySelectorAll("#info-holy .badge, #info-sport .badge")
+      .forEach(el => el.style.pointerEvents = "none");
+    
+    // Show locked notice
+    if (notice) notice.style.display = "flex";
+
+    // Hide password tab (can't change anything)
+    const navItems = document.querySelectorAll(".nav-item");
+    if (navItems[2]) navItems[2].style.display = "none";
+
+    // Replace competitions tab label
+    if (tab) {
+      tab.innerHTML = "🏆 مسابقاتي 🔒";
+    }
+  }
+}
+
+// ══════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════
 function showTab(tab) {
   // Hide all tabs
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
 
   // Show selected tab
   document.getElementById("tab-" + tab).classList.add("active");
