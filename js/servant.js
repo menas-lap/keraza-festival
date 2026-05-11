@@ -209,7 +209,7 @@ function openStudentModal(studentId) {
   document.getElementById("m-stage").textContent        = s.stage           || "—";
   document.getElementById("m-service").textContent      = s.service         || "—";
   document.getElementById("m-gender").textContent       = s.gender          || "—";
-  document.getElementById("m-birth").textContent        = s.birth_date      || "—";
+  document.getElementById("m-birth").textContent        = normalizeDateForInput(s.birth_date);
   document.getElementById("m-family").textContent       = s.family          || "—";
   document.getElementById("m-parentPhone").textContent  = s.parent_phone    || "—";
   document.getElementById("m-studentPhone").textContent = s.student_phone   || "—";
@@ -588,19 +588,23 @@ function driveThumb(url) {
   return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400`;
 }
 
-function fillModalChips(groupId, allOptions, selected) {
-  const el           = document.getElementById(groupId);
-  if (!el) return;
-  const selectedList = selected ? selected.split("\n").map(v => v.trim()) : [];
+function normalizeDateForInput(value) {
+  if (!value) return "";
 
-  el.innerHTML = "";
-  allOptions.forEach(v => {
-    const label = document.createElement("label");
-    label.className = "chip";
-    const checked   = selectedList.includes(v) ? "checked" : "";
-    label.innerHTML = `<input type="checkbox" value="${v}" ${checked}><span>${v}</span>`;
-    el.appendChild(label);
-  });
+  // already correct
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  const date = new Date(value);
+
+  if (isNaN(date.getTime())) return "";
+
+  const year  = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day   = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 // ══════════════════════════════════════════
