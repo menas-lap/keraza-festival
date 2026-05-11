@@ -121,23 +121,39 @@
       <!-- ── Competitions Tab ── -->
       <div id="tab-competitions" class="screen">
         <div class="page-title">🏆 مسابقاتي</div>
-
-        <!-- Locked notice — hidden by default -->
+      
+        <!-- Locked notice -->
         <div id="competitions-locked-notice" style="display:none;
           background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;
-          padding:16px 20px;margin-bottom:20px;color:#7B6000;font-size:0.92rem;
-          display:flex;align-items:center;gap:10px;">
+          padding:16px 20px;margin-bottom:20px;color:#7B6000;font-size:0.92rem;">
           🔒 التسجيل في المسابقات مغلق حالياً، تواصل مع خادمك لمزيد من المعلومات
         </div>
-
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-title">الروحي</div>
-          <div id="info-holy" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+      
+        <!-- View only (when locked) -->
+        <div id="comp-view-mode">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">الروحي</div>
+            <div id="info-holy" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+          </div>
+          <div class="card">
+            <div class="card-title">الرياضي</div>
+            <div id="info-sport" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+          </div>
         </div>
-
-        <div class="card">
-          <div class="card-title">الرياضي</div>
-          <div id="info-sport" style="display:flex;flex-wrap:wrap;gap:8px;">—</div>
+      
+        <!-- Edit mode (when toggle ON) -->
+        <div id="comp-edit-mode" style="display:none;">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">الروحي</div>
+            <div class="checkbox-group" id="edit-comp-holy"></div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">الرياضي</div>
+            <div class="checkbox-group" id="edit-comp-sport"></div>
+          </div>
+          <button class="btn btn-primary" id="saveCompBtn" onclick="handleSaveCompetitions()">
+            💾 حفظ المسابقات
+          </button>
         </div>
       </div>
 
