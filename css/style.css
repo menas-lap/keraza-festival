@@ -628,3 +628,39 @@ tbody td {
 @media (min-width: 769px) {
   .menu-toggle { display: none; }
 }
+
+/* ══════════════════════════════════════════
+   TOGGLE BUTTON
+══════════════════════════════════════════ */
+.toggle-btn {
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  background: var(--border-light);
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  right: 3px;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-btn.on {
+  background: var(--success);
+}
+
+.toggle-btn.on::after {
+  transform: translateX(-24px);
+}
