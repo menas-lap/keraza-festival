@@ -257,6 +257,16 @@ function renderBadges(id, value) {
     : "—";
 }
 
+function renderCompetition(id, value) {
+  const el = document.getElementById("info-" + id);
+  if (!el) return;
+  if (!value) { el.textContent = "—"; return; }
+  const items = value.split("\n").filter(v => v.trim());
+  el.innerHTML = items.length
+    ? items.map(i => `<span class="badge badge-primary">${i.trim()}</span>`).join("")
+    : "—";
+}
+
 function closeModal() {
   document.getElementById("detailModal").classList.remove("open");
   currentStudent = null;
