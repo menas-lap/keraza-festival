@@ -215,31 +215,26 @@ function openStudentModal(studentId) {
   document.getElementById("m-studentPhone").textContent = s.student_phone   || "—";
   document.getElementById("m-nid").textContent          = s.national_id     || "—";
 
-  // Apply servant toggle
-  const canEdit          = toggles.servant_edit;
-  const compEdit         = document.getElementById("modal-comp-edit");
-  const compView         = document.getElementById("modal-comp-view");
-  const compLocked       = document.getElementById("modal-comp-locked");
-  const holyView         = document.getElementById("m-holy-view");
-  const sportView        = document.getElementById("m-sport-view");
-
+  const canEdit    = toggles.servant_edit;
+  const compEdit   = document.getElementById("modal-comp-edit");
+  const compView   = document.getElementById("modal-comp-view");
+  const compLocked = document.getElementById("modal-comp-locked");
+  
   if (canEdit) {
-    if (compLocked)  compLocked.style.display  = "none";
-    if (compView)    compView.style.display    = "none";
-    if (compEdit)    compEdit.style.display    = "block";
-
-    // Fill checkboxes with current selections
+    // Toggle ON → editable checkboxes
+    if (compLocked) compLocked.style.display = "none";
+    if (compView)   compView.style.display   = "none";
+    if (compEdit)   compEdit.style.display   = "block";
     fillModalChips("m-holy",  servantOptions.holy  || [], s.holy);
     fillModalChips("m-sport", servantOptions.sport || [], s.sport);
-    
+  
   } else {
-    if (compLocked)  compLocked.style.display  = "block";
-    if (compView)    compView.style.display  = "block";
-    if (compEdit)    compEdit.style.display  = "none";
-
-    // Competitions
-    renderBadges("m-holy",  s.holy);
-    renderBadges("m-sport", s.sport);
+    // Toggle OFF → view only badges
+    if (compLocked) compLocked.style.display = "block";
+    if (compView)   compView.style.display   = "block";
+    if (compEdit)   compEdit.style.display   = "none";
+    renderBadges("m-holy-view",  s.holy);
+    renderBadges("m-sport-view", s.sport);
   }
 
   // Clear password field
