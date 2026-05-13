@@ -58,12 +58,21 @@ async function loadStudents() {
 // ══════════════════════════════════════════
 //  SAVE STUDENT EDITS
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  SAVE STUDENT COMPETITIONS
+// ══════════════════════════════════════════
 async function handleSaveCompetitions() {
-  const btn  = document.getElementById("saveCompBtn");
-  const holy  = [...document.querySelectorAll("#edit-comp-holy input:checked")]
-    .map(c => c.value).join("\n");
-  const sport = [...document.querySelectorAll("#edit-comp-sport input:checked")]
-    .map(c => c.value).join("\n");
+  if (!currentStudent) return;
+
+  const btn = document.getElementById("saveCompBtn");
+
+  const holy = [
+    ...document.querySelectorAll("#edit-comp-holy input:checked")
+  ].map(c => c.value).join("\n");
+
+  const sport = [
+    ...document.querySelectorAll("#edit-comp-sport input:checked")
+  ].map(c => c.value).join("\n");
 
   if (!holy || !sport) {
     showToast("يرجى اختيار مسابقة روحية ورياضية على الأقل", "error");
@@ -75,31 +84,39 @@ async function handleSaveCompetitions() {
 
   try {
     const res = await apiUpdateStudent({
-      studentId: session.student.student_id,
+      studentId: currentStudent.student_id,
       holy,
       sport
     });
 
     if (res.success) {
-      // Update session
-      session.student.holy  = holy;
-      session.student.sport = sport;
-      saveSession(session);
 
-      // Update view mode badges too
-      renderCompetition("holy",  holy);
-      renderCompetition("sport", sport);
+      // update current student
+      currentStudent.holy = holy;
+      currentStudent.sport = sport;
+
+      // update students array
+      const index = allStudents.findIndex(
+        s => s.student_id === currentStudent.student_id
+      );
+
+      if (index !== -1) {
+        allStudents[index].holy = holy;
+        allStudents[index].sport = sport;
+      }
 
       showToast("تم حفظ المسابقات ✅", "success");
+
     } else {
       showToast("حدث خطأ، حاول مرة أخرى", "error");
     }
+
   } catch (err) {
     showToast("حدث خطأ، تأكد من الاتصال", "error");
   }
 
   btn.disabled = false;
-  btn.innerHTML = "💾 حفظ المسابقات";
+  btn.innerHTML = "💾 حفظ التعديلات";
 }
 
 // ══════════════════════════════════════════
