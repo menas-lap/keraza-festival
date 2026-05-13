@@ -56,9 +56,6 @@ async function loadStudents() {
 }
 
 // ══════════════════════════════════════════
-//  SAVE STUDENT EDITS
-// ══════════════════════════════════════════
-// ══════════════════════════════════════════
 //  SAVE STUDENT COMPETITIONS
 // ══════════════════════════════════════════
 async function handleSaveCompetitions() {
@@ -238,14 +235,24 @@ function openStudentModal(studentId) {
   const compLocked = document.getElementById("modal-comp-locked");
   
   if (canEdit) {
-    // Toggle ON → editable checkboxes
-    if (compLocked) compLocked.style.display = "none";
-    if (compView)   compView.style.display   = "none";
-    if (compEdit)   compEdit.style.display   = "block";
-    fillModalChips("m-holy",  servantOptions.holy  || [], s.holy);
-    fillModalChips("m-sport", servantOptions.sport || [], s.sport);
-  
-  } else {
+  // Editable mode
+  if (compLocked) compLocked.style.display = "none";
+  if (compView)   compView.style.display   = "none";
+  if (compEdit)   compEdit.style.display   = "block";
+
+  fillModalChips(
+    "edit-comp-holy",
+    servantOptions.holy || [],
+    s.holy
+  );
+
+  fillModalChips(
+    "edit-comp-sport",
+    servantOptions.sport || [],
+    s.sport
+  );
+
+} else {
     // Toggle OFF → view only badges
     if (compLocked) compLocked.style.display = "block";
     if (compView)   compView.style.display   = "block";
