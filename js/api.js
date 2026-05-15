@@ -116,3 +116,18 @@ async function apiDeleteSetting(row) {
 async function apiUpdateToggle(name, value) {
   return apiPost({ action: "updateToggle", name, value });
 }
+
+// ══════════════════════════════════════════
+//  PAYMENT
+// ══════════════════════════════════════════
+async function apiUpdatePayment(studentId, activities_payment) {
+  return apiPost({ action: "updatePayment", studentId, activities_payment });
+}
+
+async function apiUpdatePaymentProof(studentId, photo, uploaderRole) {
+  return apiPost({ action: "updatePaymentProof", studentId, photo, uploaderRole });
+}
+
+async function apiTogglePaymentProofLock(studentId, locked) {
+  return apiPost({ action: "togglePaymentProofLock", studentId, locked });
+}
