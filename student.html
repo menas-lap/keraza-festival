@@ -26,6 +26,9 @@
         <button class="nav-item" onclick="showTab('competitions')">
           🏆 مسابقاتي
         </button>
+        <button class="nav-item" onclick="showTab('payment')">
+          💳 الدفع
+        </button>
         <button class="nav-item" onclick="showTab('password')">
           🔑 تغيير كلمة المرور
         </button>
@@ -154,6 +157,79 @@
           <button class="btn btn-primary" id="saveCompBtn" onclick="handleSaveCompetitions()">
             💾 حفظ المسابقات
           </button>
+        </div>
+      </div>
+
+      <!-- ── Payment Tab ── -->
+      <div id="tab-payment" class="screen">
+        <div class="page-title">💳 الدفع</div>
+      
+        <!-- Summary card -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">ملخص الدفع</div>
+      
+          <!-- Overall status badge -->
+          <div style="text-align:center;margin-bottom:20px;">
+            <div id="overall-status-badge" style="
+              display:inline-block;
+              padding:10px 28px;
+              border-radius:20px;
+              font-size:1rem;
+              font-weight:700;
+              letter-spacing:1px;
+            ">—</div>
+          </div>
+      
+          <!-- Total amount -->
+          <div style="display:flex;justify-content:space-between;align-items:center;
+            background:var(--cream);border-radius:10px;padding:14px 18px;margin-bottom:16px;">
+            <div style="font-weight:600;color:var(--text-secondary);">المبلغ الإجمالي</div>
+            <div id="total-amount" style="font-size:1.2rem;font-weight:700;color:var(--primary);">—</div>
+          </div>
+      
+          <!-- Activities breakdown -->
+          <div id="activities-breakdown"></div>
+        </div>
+      
+        <!-- Payment proof card -->
+        <div class="card">
+          <div class="card-title">إثبات الدفع</div>
+      
+          <!-- Proof image (if exists) -->
+          <div id="proof-existing" style="display:none;margin-bottom:16px;text-align:center;">
+            <img id="proof-img" src="" alt="إثبات الدفع"
+              style="max-width:100%;max-height:300px;border-radius:12px;
+                     border:2px solid var(--border-light);object-fit:contain;">
+            <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px;">
+              تم رفع إثبات الدفع
+            </div>
+          </div>
+      
+          <!-- Upload zone -->
+          <div id="proof-upload-section">
+            <div class="file-zone" id="zone-proof" style="opacity:1;transition:opacity 0.3s;">
+              <input type="file" accept="image/*" id="proof-file-input"
+                onchange="handleProofFile(this)">
+              <div class="file-icon">📄</div>
+              <div class="file-label" id="proof-zone-label">اضغط لرفع صورة إثبات الدفع</div>
+            </div>
+            <div class="preview" id="prev-proof">
+              <img id="img-proof" src="" alt="">
+              <button type="button" class="replace-btn" onclick="replaceProof()">تغيير</button>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-primary" id="uploadProofBtn"
+                onclick="handleUploadProof()" style="display:none;">
+                رفع إثبات الدفع
+              </button>
+            </div>
+            <!-- Locked notice -->
+            <div id="proof-locked-notice" style="display:none;
+              background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;
+              padding:12px 16px;color:#7B6000;font-size:0.88rem;margin-top:12px;">
+              🔒 تم قفل رفع إثبات الدفع، تواصل مع خادمك لإعادة الرفع
+            </div>
+          </div>
         </div>
       </div>
 
