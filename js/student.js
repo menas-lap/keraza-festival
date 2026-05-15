@@ -4,6 +4,7 @@
 const session = requireRole("student");
 let toggles   = {};
 let options   = {};
+let proofImage = null;
 
 if (session) init();
 
@@ -173,6 +174,8 @@ function showTab(tab) {
   const tabIndex = ["profile", "competitions", "password"].indexOf(tab);
   if (navItems[tabIndex]) navItems[tabIndex].classList.add("active");
   document.getElementById("sidebar").classList.remove("open");
+
+  if (tab === "payment") loadPaymentTab();
 }
 
 // ══════════════════════════════════════════
@@ -221,6 +224,162 @@ async function handleChangePassword() {
   btn.disabled = false;
   btn.innerHTML = "حفظ كلمة المرور الجديدة";
 }
+
+/*
+// ══════════════════════════════════════════
+//  PAYMENT TAB
+// ══════════════════════════════════════════
+function loadPaymentTab() {
+  const s       = session.student;
+  const prices  = options.prices || {};
+
+  // Parse activities_payment
+  const activities = {};
+  if (s.activities_payment) {
+    s.activities_payment.split("\n").filter(l => l.trim()).forEach(line => {
+      const [name, status] = line.split(":");
+      if (name && status) activities[name.trim()] = status.trim();
+    });
+  }
+
+  // Overall status badge
+  const badge       = document.getElementById("overall-status-badge");
+  const statusMap   = {
+    paid:    { text: "✅ مدفوع بالكامل",   bg: "#E8F5E9", color: "#2E7D32" },
+    partial: { text: "⚠️ مدفوع جزئياً",   bg: "#FFF8E1", color: "#F57F17" },
+    unpaid:  { text: "❌ غير مدفوع",       bg: "#FFEBEE", color: "#C62828" },
+  };
+  const overall     = s.payment_status || "unpaid";
+  const statusStyle = statusMap[overall] || statusMap.unpaid;
+  badge.textContent        = statusStyle.text;
+  badge.style.background   = statusStyle.bg;
+  badge.style.color        = statusStyle.color;
+
+  // Activities breakdown + total
+  const allActivities = [
+    ...(s.holy  ? s.holy.split("\n").filter(v => v.trim())  : []),
+    ...(s.sport ? s.sport.split("\n").filter(v => v.trim()) : [])
+  ];
+
+  let total = 0;
+  let html  = "";
+
+  allActivities.forEach(activity => {
+    const price  = prices[activity.trim()] || 0;
+    const status = activities[activity.trim()] || "unpaid";
+    total += price;
+
+    const isPaid     = status === "paid";
+    const statusText = isPaid ? "✅ مدفوع" : "❌ غير مدفوع";
+    const statusBg   = isPaid ? "#E8F5E9"  : "#FFEBEE";
+    const statusClr  = isPaid ? "#2E7D32"  : "#C62828";
+
+    html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;
+        padding:12px 16px;border-radius:10px;margin-bottom:8px;
+        background:var(--cream);border:1px solid var(--border-light);">
+        <div style="font-weight:600;">${activity.trim()}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-weight:700;color:var(--primary);">${price} جنيه</div>
+          <div style="padding:4px 12px;border-radius:12px;font-size:0.82rem;
+            font-weight:700;background:${statusBg};color:${statusClr};">
+            ${statusText}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById("activities-breakdown").innerHTML = html;
+  document.getElementById("total-amount").textContent = total + " جنيه";
+
+  // Payment proof
+  const isLocked = s.payment_proof_locked === true ||
+                   s.payment_proof_locked === "true" ||
+                   s.payment_proof_locked === "TRUE";
+
+  if (s.payment_proof) {
+    document.getElementById("proof-existing").style.display = "block";
+    document.getElementById("proof-img").src = driveThumb(s.payment_proof);
+  }
+
+  const zoneEl    = document.getElementById("zone-proof");
+  const fileInput = document.getElementById("proof-file-input");
+  const notice    = document.getElementById("proof-locked-notice");
+
+  if (isLocked) {
+    // Disable upload
+    zoneEl.style.opacity      = "0.5";
+    zoneEl.style.pointerEvents = "none";
+    fileInput.disabled         = true;
+    notice.style.display       = "block";
+  } else {
+    zoneEl.style.opacity       = "1";
+    zoneEl.style.pointerEvents = "auto";
+    fileInput.disabled         = false;
+    notice.style.display       = "none";
+  }
+}
+
+function handleProofFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  compressImage(file).then(base64 => {
+    proofImage = base64;
+    document.getElementById("img-proof").src  = base64;
+    document.getElementById("prev-proof").classList.add("on");
+    document.getElementById("zone-proof").style.display  = "none";
+    document.getElementById("uploadProofBtn").style.display = "block";
+  });
+}
+
+function replaceProof() {
+  proofImage = null;
+  document.getElementById("img-proof").src = "";
+  document.getElementById("prev-proof").classList.remove("on");
+  document.getElementById("zone-proof").style.display = "";
+  document.getElementById("proof-file-input").value   = "";
+  document.getElementById("uploadProofBtn").style.display = "none";
+}
+
+async function handleUploadProof() {
+  if (!proofImage) return;
+
+  const btn = document.getElementById("uploadProofBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري الرفع...';
+
+  try {
+    const res = await apiUpdatePaymentProof(
+      session.student.student_id,
+      proofImage,
+      "student"
+    );
+
+    if (res.success) {
+      // Update session
+      session.student.payment_proof        = res.url;
+      session.student.payment_proof_locked = true;
+      saveSession(session);
+
+      showToast("تم رفع إثبات الدفع بنجاح ✅", "success");
+
+      // Refresh payment tab
+      loadPaymentTab();
+      replaceProof();
+
+    } else if (res.reason === "locked") {
+      showToast("🔒 إثبات الدفع مقفول، تواصل مع خادمك", "error");
+    } else {
+      showToast("حدث خطأ، حاول مرة أخرى", "error");
+    }
+  } catch (err) {
+    showToast("حدث خطأ، تأكد من الاتصال", "error");
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = "رفع إثبات الدفع";
+}
+*/
 
 // ══════════════════════════════════════════
 //  DRIVE THUMBNAIL
